@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "
 
 # Site Settings
 locale                   : "pt-BR"
-title                    : "jlowborn.github.io"
+title                    : "JLowborn Cybersecurity Blog"
 title_separator          : "-"
 name                     : "Lowborn"
 description              : "My personal cybersecurity study blog"
