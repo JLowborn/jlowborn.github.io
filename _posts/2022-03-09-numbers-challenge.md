@@ -5,8 +5,6 @@ date: 2022-03-09
 classes: wide
 ---
 
-# Numb3rs Challenge
-
 Esse foi um desafio passado como uma atividade durante as aulas que tive durante a graduação, resolvi fazer um write-up como forma de *freezar* o que eu aprendi, e claro, mostrar como Python é extremamente divertido de se usar.
 
 
