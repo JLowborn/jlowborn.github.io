@@ -1,5 +1,5 @@
 ---
-Llayout: single
+layout: single
 title: Numb3rs Challenge
 date: 2022-03-09
 classes: wide
