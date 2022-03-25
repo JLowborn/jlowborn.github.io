@@ -1,3 +1,6 @@
+# Not finished posts
+/pre
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
