@@ -11,11 +11,9 @@ It's been a while since someone told me to start writing a blog about what I'm l
 
 ## Understanding the network
 
----
-
 So before we start hacking, we must understand what are we dealing with. So here's the network diagram.
 
-![](/home/rebellion/git/JLowborn.github.io/assets/images/posts/network_diagram1.jpg)
+![](/assets/images/posts/1.jpg)
 
 As you can see, we have 3 servers, the first one being a Linux Box, which we'll be using to access an AD (Active Directory) server, as well as a confidential repository. Now, for the spoiler: Our objective here is to gain access to the confidential repository by pivoting our connection through the Linux server, and for this we'll be using [sshuttle](https://github.com/sshuttle/sshuttle), as well as some enumeration and post-exploitation tools for Windows. OBS: We'll be starting from the point we've already compromised the Linux server.   
 
@@ -27,9 +25,13 @@ So first things first, we need to reach the subnet, don't we? We could be using 
 
 <script id="asciicast-EV3dETAYOKaYRgweDm0V7JOod" src="https://asciinema.org/a/EV3dETAYOKaYRgweDm0V7JOod.js" async></script>
 
+
+
+## Dump & Spray
+
 Know that now we're inside the target's subnet, and this means we can continue the hack with further exploration. We'll not try connecting directly to Confidential Repository since I already know this isn't going to work. One of the most useful techniques I've learned recently is *Password Spraying* which basically represent using a password you've found and try using it to login in every single account you can. We have a password, but no accounts, so our next step is to list accounts available on the server, and for this we'll be using [ldapdomaindump](https://github.com/dirkjanm/ldapdomaindump).
 
-<script id="asciicast-FHaB7Ybed3a22UNiKeDVQan5O" src="https://asciinema.org/a/FHaB7Ybed3a22UNiKeDVQan5O.js" async></script>
+<script id="asciicast-SGvfpuei4zVUdsdXBTs8WBDaZ" src="https://asciinema.org/a/SGvfpuei4zVUdsdXBTs8WBDaZ.js" async></script>
 
 Now we've managed to find a user list, we're going to use `awk` to parse the information we need in order to start a password spraying attack. Note that using this attack will surely trigger the SOC team, so be careful when doing so, but here I'm using a custom lab, so we're good. Now we parse the users to a list for further usage.
 
@@ -61,16 +63,20 @@ We found out that user `Goro.Takemura` uses the same password as the user we've 
 
 <script id="asciicast-SBFO9jvs6ZSrwnHahZnXDkqj3" src="https://asciinema.org/a/SBFO9jvs6ZSrwnHahZnXDkqj3.js" async></script>
 
+
+
+## Pass2Win
+
 With all these hashes we've just obtained, we can try a new technique I've just learned about, it's called *PassTheHash*, which basically allows us to impersonate another user without need of the plaintext password to login. For this we'll now use `xfreerdp` which is mainly used for RDP connections. The only problem left to solve is which one of the users is allowed to RDP, and spoiler: It's not the `ITAdmin`, but if you've played *Cyberpunk 2077*, you can tell it could be the protagonist of the game, V, and if you said so, congratulations, you're right. In the process of solving this challenge I've made bash script to automate the process of trying each user and hash until some user login, but we're not doing this here, so let's just connect to the Confidential Repository:
 
 <script id="asciicast-0BqlfzxnsC3YNNTCfHoE1sRkW" src="https://asciinema.org/a/0BqlfzxnsC3YNNTCfHoE1sRkW.js" async></script>
 
 After this command, another windows pops up, with a RDP session opened on it, we're now able to access machine's information, and check which user are we currently logged on.
 
-![](/assets/images/posts/lateral_movement/1.png)
+![](/assets/images/posts/lateral_movement/2.png)
 
 Also, the flag is inside the `database.txt` file, which has the following message: 
 
-![](/assets/images/posts/lateral_movement/2.png)
+![](/assets/images/posts/lateral_movement/3.png)
 
-This challenge showed me that I have a **LOT** to learn about Windows machines as said early, but also showed me how fun it is to bypass Windows protections and how some techniques could be applied in real life scenaries, hope you've learned something new too.*Hack on!*
+This challenge showed me that I have a **LOT** to learn about Windows machines as said early, but also showed me how fun it is to bypass Windows protections and how some techniques could be applied in real life scenaries, hope you've learned something new too. *Hack on!*
