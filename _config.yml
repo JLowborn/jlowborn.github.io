@@ -94,7 +94,7 @@ author:
   linkedin         : "https://www.linkedin.com/in/carlosjesus46/"
   uri              :
   home             : # null (default), "absolute or relative url to link to author home"
-  github           : "https://github.com/JLowborn"
+  github           : "JLowborn"
   twitter          : # ""
   youtube          : # ""
 
