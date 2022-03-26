@@ -13,7 +13,7 @@ It's been a while since someone told me to start writing a blog about what I'm l
 
 So before we start hacking, we must understand what are we dealing with. So here's the network diagram.
 
-![](/assets/images/posts/1.jpg)
+![](/assets/images/posts/lateral_movement/1.jpg)
 
 As you can see, we have 3 servers, the first one being a Linux Box, which we'll be using to access an AD (Active Directory) server, as well as a confidential repository. Now, for the spoiler: Our objective here is to gain access to the confidential repository by pivoting our connection through the Linux server, and for this we'll be using [sshuttle](https://github.com/sshuttle/sshuttle), as well as some enumeration and post-exploitation tools for Windows. OBS: We'll be starting from the point we've already compromised the Linux server.   
 
