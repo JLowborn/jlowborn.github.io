@@ -5,6 +5,8 @@ date: 2024-06-30
 classes: wide
 ---
 
+Another machine from PwnTillDawn, this time we'll be exploring FTP servers, let's go!
+
 # Portal (10.150.150.12)
 
 ![](/assets/images/posts/pwntilldawn_portal/1.png)
