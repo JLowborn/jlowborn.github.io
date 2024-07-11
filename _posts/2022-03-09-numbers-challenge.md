@@ -5,60 +5,59 @@ date: 2022-03-09
 classes: wide
 ---
 
-Esse foi um desafio passado como uma atividade durante as aulas que tive durante a graduação, resolvi fazer um write-up como forma de *freezar* o que eu aprendi, e claro, mostrar como Python é extremamente divertido de se usar.
+This was a challenge given as an activity during my undergraduate classes. I decided to write a write-up to solidify what I learned, and of course, to show how incredibly fun Python is to use.
 
 
 
-## O Desafio
+## The Challenge
 
-O desafio aparenta ser relativamente simples, ao fazer a conexão em
-`numb3rs.hopto.org:8012` somos recebidos com a seguinte mensagem::
+The challenge appears to be relatively simple. Upon connecting to `numb3rs.hopto.org:8012`, we are greeted with the following message:
 
 ![](/assets/images/posts/numbers_challenge/1.jpg)
 
-Espera-se que seja enviado como resposta o número que é mostrado na tela, e essa é mensagem recebida caso a resposta esteja correta:
+It is expected that you send back the number displayed on the screen, and this is the message received if the response is correct:
 
 ![](/assets/images/posts/numbers_challenge/2.jpg)
 
-Também podemos notar que caso a reposta demore para ser enviada, estando correta ou não, o servidor deixa de responder a conexão, nos deixando como única opção encerrar a conexão:
+We can also note that if the response takes too long to be sent, whether it is correct or not, the server stops responding to the connection, leaving us with no other option but to terminate the connection:
 
 ![](/assets/images/posts/numbers_challenge/3.jpg)
 
-É fácil perceber que (a menos que você tenha a paciência e os dedos de um mestre pianista) não podemos simplesmente fazer isso puramente digitando, então vamos fazer um programa que consiga resolver esse problema para nós.
+It's easy to see that (unless you have the patience and fingers of a master pianist) we can't simply do this by typing manually. So, let's write a program that can solve this problem for us.
 
 
 
-## O Problema
+## The Problem
 
-Para resolver isso, vamos precisar analisar o que está sendo enviado pela conexão quando abrimos ela, e apesar de poder ser feito através de diversos métodos, vamos usar Python pra isso.
+To solve this, we need to analyze what is being sent over the connection when we open it. While this can be done using various methods, we will use Python for this task.
 
 ```python
-import socket # Gerencia a conexão
+import socket
 
 host = "numb3rs.hopto.org"
 port = 8012
 
-# Pro tip: Você sabia que pode usar socket com "with" ao invés do método tradicional com variáveis?
+# Pro tip: Did you know that you can use sockets with the "with" statement instead of the traditional method with variables?
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((host, port)) # Realiza a conexão
-    data1 = s.recv(1024) # Recebe os dados
+    s.connect((host, port))
+    data1 = s.recv(1024)
     data2 = s.recv(1024)
     
 print(data1)
 print(data2)
 ```
 
-Perceba que usamos `s.recv(1024)` duas vezes para o recebimento de dados, isso acontece porquê o servidor nos envia duas mensagens ao invés de apenas uma, e os números são mostrados sempre na segunda. Devo adiantar que quando acertamos a resposta, recebemos novamente duas respostas, sendo que uma é uma confirmação de que acertamos e a outra contém o número.
+Notice that we use `s.recv(1024)` twice to receive data. This is because the server sends us two messages instead of just one, and the numbers are always shown in the second message. I should mention that when we get the answer right, we receive two responses again: one is a confirmation that we were correct, and the other contains the next number.
 
 ![](/assets/images/posts/numbers_challenge/4.jpg)
 
-O problema é que em momento algum o servidor nos envia os números de forma legível e, ao invés disso, o que temos são strings representandos os números, então precisamos pensar em como ler os valores recebidos e interpretá-los.
+The problem is that the server never sends us the numbers in a readable form; instead, it sends strings representing the numbers. So, we need to think about how to read the received values and interpret them accordingly.
 
 
 
-## A Solução
+## An Elegant Solution
 
-A melhor maneira de lidar com esse desafio é entender que cada número é representado por uma string, e isso significa que devemos criar um dicionário para ler cada string e interpretá-las. Antes de criar o dicionário é necessário separar as respostas da melhor forma possível para que possamos criá-lo.
+To handle this challenge, the best approach is to understand that each number is represented by a string. This means we can create a dictionary to map each string to its corresponding number. Before creating the dictionary, we need to separate the responses appropriately so that we can build it.
 
 ```python
 import socket
@@ -76,11 +75,11 @@ print(data)
 pp([string.strip() for string in data.split("\n\n")])
 ```
 
-A função `pprint` vem de Pretty Print, e é útil quando se precisa printar mensagens de forma legível. Usamos `strip` Também substituímos a variável data1 por `_` uma vez que não vamos precisar dessa informação no código. E temos a seguinte resposta:
+The function `pprint` comes from Pretty Print and is useful when you need to print messages in a readable format. We use `strip`. We also replaced the variable `data1` with `_` since we won't need that information in the code. And we have the following response:
 
 ![](/assets/images/posts/numbers_challenge/5.jpg)
 
-As duas primeiras linhas a última linha não são de fato relevantes, mas isso não é um problema, ainda sim, temos que lidar com os \n contidos no código, e podemos fazer isso com `replace` .
+The first two lines and the last line are not actually relevant, but that's not a problem. Nevertheless, we still need to handle the `\n` characters in the code, and we can do that using `replace`.
 
 ```python
 pp([string.replace("\n", "").strip() for string in data.split("\n\n")])
@@ -88,11 +87,11 @@ pp([string.replace("\n", "").strip() for string in data.split("\n\n")])
 
 ![](/assets/images/posts/numbers_challenge/6.jpg)
 
-Agora temos as strings númeridas da forma mais limpa possível, e isso é bom, podemos finalmente criar o dicionário. Para pegar a string, apenas precisamos rodar o código algumas vezes para termos todas os 10 dígitos possíveis, e com isso temos nosso dicionário. Por conta de alguns imprevistos aleatórios, infelizmente eu não posso colocar o código diretamente aqui, mas o dicionário deve se parecer com esse:
+Now we have the numeric strings in the cleanest form possible, which is good. We can finally create the dictionary. To get each string, we just need to run the code a few times to capture all 10 possible digits, and then we have our dictionary. Due to some random unforeseen issues, unfortunately, I can't directly provide the code here, but the dictionary should look like this:
 
 ![](/assets/images/posts/numbers_challenge/bonus.png)
 
-Com esse dicionário, podemos fazer a conversão das strings para seus respectivos números, e teremos a resposta.
+With this dictionary, we can convert the strings into their respective numbers, and then we will have the answer.
 
 ```python
 answer = [
@@ -102,25 +101,25 @@ answer = [
 print("".join(answer))
 ```
 
-Ao executar o código temos o seguinte resultado:
+When running the code, we get the following result:
 
 ![](/assets/images/posts/numbers_challenge/7.jpg)
 
-Esse erro acontece pelo seguinte motivo, caso não fosse utilizada a função `get` no dicionário, as strings que não existem nesse dicionário causariam um erro, por isso usamos `get` , assim podemos definir um valor padrão caso a string não seja encontrada. Ainda sim, quando tentamos usar `join` na lista de números, o valor None causou esse erro, e para isso devemos remover esse valor. A função `filter` é ideal para esse situação uma vez que ela pode remover todos os valores que não queremos da lista e deixar apenas os que importam, então, como mencionado antes, as strings não relevantes não são um problema.
+This error occurs for the following reason: if the `get` function isn't used in the dictionary, strings that don't exist in the dictionary would cause an error. That's why we use `get`, so we can define a default value if the string isn't found. However, when trying to use `join` on the list of numbers, the `None` value caused this error, and to fix this, we need to remove that value. The `filter` function is ideal for this situation because it can remove all unwanted values from the list and leave only those that matter. As mentioned before, the irrelevant strings are not a problem.
 
 ```python
 print("".join(list(filter(None, answer))))
 ```
 
-E com esse pequeno erro corrigido, podemos novamente executar o código e ter a resposta que esperamos.
+With this small error corrected, we can run the code again and get the expected answer.
 
 ![](/assets/images/posts/numbers_challenge/8.jpg)
 
 
 
-## O Resultado
+## The Outcome
 
-Agora o que nos resta fazer é criar um loop que repita essa mesma ação 1337 vezes e que também envie as informações para o servidor. Essa é a parte mais simples.
+Now, all that remains is to create a loop that repeats this action 1337 times and also sends the information back to the server. This is the simplest part.
 
 ```python
 import socket
@@ -148,8 +147,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print(answer)
 ```
 
-Removemos a função `pprint` do código uma vez que já não precisamos mais dela, criamos um laço de `for` para repetir as ações de receber traduzir e enviar as informações 1337 vezes, e usamos `s.send(bytes(answer, 'utf-8"))` para enviar a resposta no formato de bytes para que o servidor possa entender, com isso apenas precisamos executar o código uma última vez e voilà, temos a nossa flag.
+We removed the `pprint` function from the code since we no longer need it. We created a `for` loop to repeat the actions of receiving, translating, and sending information 1337 times. We used `s.send(bytes(answer, 'utf-8'))` to send the response in byte format so the server can understand it. Now, all we need to do is execute the code one last time, and voilà, we have our flag.
 
 ![](/assets/images/posts/numbers_challenge/9.jpg)
 
-A flag final é `FIAP{th353_nuMb3r5_4r3_s0_b0r1n6!}` . Foi super divertido pensar em como resolver esse desafio, também nos ajuda à entender como separar strings, trabalhar com sockets e dicionários. Então é isso, espero poder ter ensinado algo novo à você e *Hack On!*
+The final flag is `FIAP{th353_nuMb3r5_4r3_s0_b0r1n6!}`. It was a lot of fun figuring out how to solve this challenge. It also helps us understand how to manipulate strings, work with sockets, and use dictionaries effectively. So that's it, I hope I've taught you something new, and *Hack On!*
