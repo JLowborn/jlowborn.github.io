@@ -60,21 +60,18 @@ Usually we would go for a privilege escalation method, but this is even simpler,
 The final flag is inside root's home directory, nice security Mike!
 
 **FLAG35**
-
 <details>
   <summary>Click to reveal</summary>
   	724a2734e80ddbd78b2694dc5eb74db395403360
-</details>
-
+</details>  
+  
 **FLAG36**
-
 <details>
   <summary>Click to reveal</summary>
   	8cff2cce1a88a54db986d968a4b7a66fb3588c20
-</details>
-
+</details>  
+  
 **FLAG37**
-
 <details>
   <summary>Click to reveal</summary>
 	28d10397e475a50fc0d6c73f7c23355ebdf15a3f
