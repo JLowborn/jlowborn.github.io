@@ -1,7 +1,7 @@
 ---
 layout: single
 title: PwnTillDawn - FullMounty Write-Up
-date: 2024-07-11
+date: 2024-06-11
 classes: wide
 ---
 
