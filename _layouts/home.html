@@ -9,31 +9,39 @@ layout: default
       <span id="typewriter" class="header-text"></span>
       <span class="cursor"></span>
     </div>
+    <div class="scroll-indicator">
+      <a href="#posts" class="scroll-down">
+          <i class="fas fa-chevron-down"></i>
+      </a>
+    </div>
   </div>
   {% endif %}
 
-  <div class="posts">
+
+
+  <div class="posts" id="posts">
     {% for post in paginator.posts %}
     <div class="post-teaser">
-      <header>
-        <h1>
-          <a class="post-link" href="{{ post.url | relative_url }}">
-            {{ post.title }}
-          </a>
-        </h1>
-        <p class="meta">
-          {{ post.date | date: "%B %-d, %Y" }}
-        </p>
-      </header>
-      <div class="excerpt">
-        {{ post.excerpt }}
-        <a class="button" href="{{ post.url | relative_url }}">
-          {{ site.theme_settings.str_continue_reading }}
-        </a>
-      </div>
+        <header>
+            <h1>
+                <a class="post-link" href="{{ post.url | relative_url }}">
+                    {{ post.title }}
+                </a>
+            </h1>
+            <p class="meta">
+                {{ post.date | date: "%B %-d, %Y" }}
+            </p>
+        </header>
+        <div class="excerpt">
+            <p>{{ post.description }}</p>
+            <a class="button" href="{{ post.url | relative_url }}">
+                {{ site.theme_settings.str_continue_reading }}
+            </a>
+        </div>
     </div>
     {% endfor %}
-  </div>
+</div>
+
 
   {% if paginator.total_pages > 1 %}
   <div class="pagination">

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+	<meta charset="utf-8">
+	<title>PwnTillDawn - Portal Write-Up | JLowborn Cybersecurity Blog</title>
+	<meta name="description"
+		content="Portal (10.150.150.12)">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/assets/css/main.css">
+
+	<!--Favicon-->
+	<link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+	<!-- Canonical -->
+	<link rel="canonical" href="/2024/06/30/pwntilldawn-portal.html">
+
+	<!-- RSS -->
+	<link rel="alternate" type="application/atom+xml" title="JLowborn Cybersecurity Blog"
+		href="/feed.xml" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+	<!-- Google Fonts -->
+	
+	<link href="//fonts.googleapis.com/css2?family=Playfair+Display:400,700 T+Sans:400,700,700italic,400italic" rel="stylesheet"
+		type="text/css">
+	
+</head>
+  <body>
+    <header class="site-header">
+	<div class="branding">
+		
+		<h1 class="site-title">
+			<a href="/">JLowborn Cybersecurity Blog</a>
+		</h1>
+	</div>
+	<nav class="site-nav">
+		<ul>
+			
+			
+			
+			
+			
+			<li>
+				<a class="page-link" href="/curriculum/">
+					Curriculum
+				</a>
+			</li>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<!-- Social icons from Font Awesome, if enabled  -->
+			
+
+
+<li>
+	<a href="mailto:wjunior50@gmail.com" title="Email">
+		<i class="fas fa-fw fa-envelope"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="https://github.com/jlowborn" title="Follow on GitHub">
+		<i class="fab fa-fw fa-github"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+<li>
+	<a href="https://www.linkedin.com/in/jlowborn/" title="Follow on LinkedIn">
+		<i class="fab fa-fw fa-linkedin"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Search bar -->
+            
+		</ul>
+	</nav>
+
+</header>
+
+    <div class="content">
+      <article >
+  <header style="background-image: url('/')">
+    <h1 class="title">PwnTillDawn - Portal Write-Up</h1>
+    
+    <p class="meta">
+      June 30, 2024
+      
+    </p>
+  </header>
+  <section class="post-content"><h1 id="portal-1015015012">Portal (10.150.150.12)</h1>
+
+<p><img src="/assets/img/post/pwntilldawn_portal/1.png" alt="" /></p>
+
+<h2 id="network-scanning">Network Scanning</h2>
+
+<p>This is a fairly simple and straight forward challenge, so let’s start up by scanning the target machine.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nmap -sV -sC 10.150.150.12 -oN nmap.txt
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_portal/2.png" alt="" /></p>
+
+<p>If you like many others have tried Metasploitable2 to study, you’ve probably recognized the <code class="language-plaintext highlighter-rouge">vsFTPd 2.3.4</code> version. If that’s not the case, just know that this version has a built-in backdoor that can be easily exploited.</p>
+
+<h2 id="exploiting-ftp">Exploiting FTP</h2>
+
+<p>This FTP version is easy to exploit, whenever a username containing <code class="language-plaintext highlighter-rouge">:)</code> at the end is supplied, a bind shell is triggered on port 6200. You can either use Metasploit, download any exploit online or do it by hand. I’ll stick with the last option.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ftp 10.150.150.12
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_portal/3.png" alt="" /></p>
+
+<p>It really doesn’t matter which username is supplied, as long as there’s a smiley at the end. Once done, you can simply connect to the target machine using <code class="language-plaintext highlighter-rouge">netcat</code> on port 6200.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc 10.150.150.12 6200
+</code></pre></div></div>
+
+<p><img src="/assets/img/post/pwntilldawn_portal/4.png" alt="" /></p>
+
+<p>And just like that you can print out the flag!</p>
+</section>
+  
+
+</article>
+
+<!-- Disqus -->
+
+
+<!-- Post navigation -->
+
+
+    </div>
+    
+<script src="/assets/js/katex_init.js"></script>
+
+
+<script src="/assets/js/typewriter.js"></script>
+
+
+<footer class="site-footer">
+	<p class="text"><i>"The world is full of fascinating problems waiting to be solved."</i>
+</p>
+</footer>
+
+
+  </body>
+</html>

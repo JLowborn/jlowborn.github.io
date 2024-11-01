@@ -2,7 +2,7 @@
 <html class="no-js">
   <head>
 	<meta charset="utf-8">
-	<title>Page not found | JLowborn Cybersecurity Blog</title>
+	<title> JLowborn Cybersecurity Blog</title>
 	<meta name="description"
 		content="Just a bored hacker sharing secrets and tips.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,10 +46,12 @@
 			
 			
 			<li>
-				<a class="page-link" href="/about/">
-					About
+				<a class="page-link" href="/curriculum/">
+					Curriculum
 				</a>
 			</li>
+			
+			
 			
 			
 			
@@ -138,10 +140,32 @@
     <div class="content">
       <article >
   <header style="background-image: url('/')">
-    <h1 class="title">Page not found</h1>
+    <h1 class="title"></h1>
     
   </header>
-  <section class="post-content"><p>Sorry, the requested page wasn’t found on the server.</p>
+  <section class="post-content"><div class="container" style="text-align: center; margin-top: 100px;">
+    <h1 style="font-size: 4em;">Page not found</h1>
+    <div id="typewrite" style="font-size: 2em; margin-top: 20px;">Uh oh, looks like this page is missing.</div>
+    <p style="margin-top: 20px;">
+        <a href="/" class="button">Go to Homepage</a>
+    </p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typewriter-effect/2.18.0/core.js"></script>
+
+<script>
+    const typewriter = new Typewriter('#typewrite', {
+        loop: false,
+        cursor: '|',
+    });
+
+    typewriter
+        .pauseFor(1000)
+        .typeString('Oops! Looks like this page doesn’t exist.')
+        .pauseFor(500)
+        .start();
+</script>
+
 </section>
 </article>
 
