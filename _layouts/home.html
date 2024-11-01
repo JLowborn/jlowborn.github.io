@@ -3,10 +3,12 @@ layout: default
 ---
 
 <div class="home">
-  {% if site.theme_settings.header_text %}
-  <div class="call-out"
-  style="background-image: url('{{ site.baseurl }}/{{ site.theme_settings.header_text_feature_image }}')">
-    {{ site.theme_settings.header_text }}
+  {% if site.theme_settings.header_text_feature_image %}
+    <div class="call-out"
+    style="background-image: url('{{ site.baseurl }}/{{ site.theme_settings.header_text_feature_image }}')">
+      <span id="typewriter" class="header-text"></span>
+      <span class="cursor"></span>
+    </div>
   </div>
   {% endif %}
 

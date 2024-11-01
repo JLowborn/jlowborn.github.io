@@ -1,20 +1,42 @@
-// Header text feature
+// Hero Image with Blur Effect
 .call-out {
-  @extend %padding-regular;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
   width: 100%;
-  background-color:$header-desc-background-color;
-  background-size: cover;
-  font-size: 1.2em;
-  text-align: center;
+  position: relative;
   color: $header-desc-text-color;
+  z-index: 1;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/assets/img/hero.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    z-index: -1;
+  }
 }
-.call-out p:last-child {
-  margin-bottom: 0;
+
+.call-out .header-text {
+  padding: 20px;
+  max-width: 800px;
+  border-radius: 8px;
+  color: $header-desc-text-color;
+  z-index: 1;
 }
+
 .call-out a {
-  color: $header-desc-link-color
+  color: $header-desc-link-color;
 }
+
 // Post listing
 .posts {
   .post-teaser {

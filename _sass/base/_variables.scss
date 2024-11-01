@@ -1,6 +1,6 @@
 // Typography
-$font-family-main: 'Source Sans Pro', Helvetica, Arial, sans-serif !default;
-$font-family-headings: 'Source Sans Pro', Helvetica, Arial, sans-serif !default;
+$font-family-main: 'Raleway', Helvetica, Arial, sans-serif !default;
+$font-family-headings: 'Raleway', Helvetica, Arial, sans-serif !default;
 $font-size: 1.10em !default;
 
 // Padding
@@ -9,13 +9,13 @@ $padding-small: 5% !default;
 $padding-x-small: 3% !default;
 
 // Brand colours
-$brand-color: #fff !default;
-$background-color: #fff !default;
+$brand-color: #00000000 !default;
+$background-color: #151618 !default;
 $border-color: rgba(0, 0, 0, 0.1) !default; // rgba recommended if using feature images
 
 // Typography colours
-$text-color: #383838 !default;
-$link-color: #1ABC9C !default;
+$text-color: #a9abb3 !default;
+$link-color: #8442ff !default;
 $selection-color: #D4D4D4 !default; // visible when highlighting text
 
 // Tags color
@@ -25,13 +25,13 @@ $tags-color: #b0b0b0 !default;
 $search-color: #999 !default;
 
 // Header colours
-$header-link-color: #383838 !default;
+$header-link-color: #eee !default;
 
 // Feature image for articles
-$feature-image-text-color: #fff !default;
+$feature-image-text-color: #eee !default;
 $feature-image-size: cover !default; // options include "cover", "contain", "auto"
 
 // Header description box
 $header-desc-background-color: #1ABC9C !default;
-$header-desc-text-color: #FFF !default;
+$header-desc-text-color: #eee !default;
 $header-desc-link-color: #02453D !default;

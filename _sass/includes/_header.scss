@@ -1,10 +1,13 @@
 .site-header {
   @extend %padding-small;
-  background: $brand-color;
+  // background: $brand-color;
   border-bottom: 1px solid $border-color;
   display: inline-block;
   float: left;
   width: 100%;
+  position: absolute; /* Fixed positioning */
+  top: 0; /* Ensure it stays at the top */
+  z-index: 2; /* Ensure it's above the hero image */
 
   a {
     color: $header-link-color;
@@ -54,39 +57,117 @@
     }
   }
 
-    /* --- Search form --- */
-    form {
-        border: 0;
-        border-bottom: 2px solid $search-color;
-        outline: 0;
+  /* --- Search form --- */
+  form {
+    border: 0;
+    border-bottom: 2px solid $search-color;
+    outline: 0;
 
-        *:focus {
-            outline: none;
-        }
-
-        input{
-            &[type=text] {
-                box-sizing: border-box;
-                border: 0;
-                outline: 0;
-                color: $search-color;
-            }
-
-            &::-moz-placeholder {
-                color: $search-color;
-                opacity: 1;
-            }
-
-            &:-ms-input-placeholder, &::-webkit-input-placeholder {
-                color: $search-color;
-            }
-        }
-
-        button {
-           border: none;
-           font-size: 0.9em;
-           background-color: $brand-color;
-           color: $search-color;
-        }
+    *:focus {
+      outline: none;
     }
+
+    input {
+      &[type=text] {
+        box-sizing: border-box;
+        border: 0;
+        outline: 0;
+        color: $search-color;
+      }
+
+      &::-moz-placeholder {
+        color: $search-color;
+        opacity: 1;
+      }
+
+      &:-ms-input-placeholder,
+      &::-webkit-input-placeholder {
+        color: $search-color;
+      }
+    }
+
+    button {
+      border: none;
+      font-size: 0.9em;
+      background-color: $brand-color;
+      color: $search-color;
+    }
+  }
+}
+
+.call-out {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full height of the viewport */
+  width: 100%;
+  position: relative;
+  color: $header-desc-text-color;
+  z-index: 1; /* Ensure the text is above the image */
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/assets/img/hero.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    z-index: -1; /* Behind the text */
+  }
+}
+
+.call-out .header-text {
+  padding: 20px;
+  max-width: 800px;
+  border-radius: 8px;
+  color: $header-desc-text-color;
+  z-index: 1;
+  font-size: 3em; // Default size for large screens
+  text-align: center; // Center text
+
+  @media (max-width: 768px) {
+    font-size: 2.5em; // Adjust size for medium screens
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2em; // Adjust size for small screens
+  }
+}
+
+.call-out a {
+  color: $header-desc-link-color;
+}
+
+.cursor {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid white;
+  color: $header-desc-text-color;
+  z-index: 1;
+  font-size: 3em;
+  animation: blink 0.7s infinite alternate;
+  pointer-events: none;
+
+  @media (max-width: 768px) {
+    font-size: 2.5em;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2em;
+  }
+}
+
+@keyframes blink {
+  0% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: white;
+  }
 }
