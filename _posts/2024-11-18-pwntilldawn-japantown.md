@@ -3,7 +3,7 @@ layout: post
 title: PwnTillDawn - Japantown Write-Up
 date: 2024-11-18
 classes: wide
-description: Depixelanting passwords and backdooring debian packages to success!
+description: Depixelating passwords and backdooring debian packages to success!
 ---
 
 # Japantown (10.150.150.21)
