@@ -1,7 +1,7 @@
 ---
 layout: post
 title: PwnTillDawn - Choker Write-Up
-date: 2025-02-24
+date: 2025-02-25
 classes: wide
 description: Enumerating users through SMTP service, bruteforcing accounts and escalating privileges by hijacking Python 2.7 modules.
 ---
