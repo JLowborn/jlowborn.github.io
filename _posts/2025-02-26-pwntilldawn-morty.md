@@ -8,7 +8,7 @@ description: Using DNS queries to enumerate subdomains, acquiring credentials fr
 
 # Morty (10.150.150.57)
 
-![](/home/rebellion/CTF/PTD/Morty/evidence/1.png)
+![](/assets/img/post/pwntilldawn_morty/1.png)
 
 
 
@@ -20,7 +20,7 @@ As usual, let's use Nmap to identify services in the machine:
 sudo nmap -sV -sC -p- 10.150.150.57 -oN scans/nmap.txt
 ```
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/2.png)
+![](/assets/img/post/pwntilldawn_morty/2.png)
 
 Some relevant information from the scanning result:
 
@@ -55,7 +55,7 @@ Is it a password? Maybe.
 
 And the following background image with a `Fl4sk#!` password written on it:
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/3.png)
+![](/assets/img/post/pwntilldawn_morty/3.png)
 
 I'd recommend downloading the image from the site, this will be useful later on.
 
@@ -65,7 +65,7 @@ Enumerating the web server is a waste, we can't find any other directories, and 
 dig axfr @10.150.150.57 mortysserver.com
 ```
 
-![](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/4.png)
+![](/assets/img/post/pwntilldawn_morty/4.png)
 
 Although requesting any records returns an `email` subdomain, it doesn't have any additional information, instead it has the same contents as `www`, but requesting a Zone Tranfer reveals a new subdomain: `rickscontrolpanel`. Once more, the newly found subdomain must be added in `/etc/hosts` file:
 
@@ -79,7 +79,7 @@ Although requesting any records returns an `email` subdomain, it doesn't have an
 
 Accessing Rick's Control Panel show up a phpMyAdmin login page and the first flag (`FLAG1`), which unfortunately we don't have credentials to access:
 
-![5](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/5.png)
+![5](/assets/img/post/pwntilldawn_morty/5.png)
 
 After trying to guess some obvious usernames such as *Rick* and *Morty*, I've thought about something different. The image we saw earlier had been edited to add the password, so maybe it's related to it as well. Thought we can't find any information in metadata, the password can be used to extract information from the image using Steghide:
 
@@ -99,11 +99,11 @@ rick:WubbaLubbaDubDub1!
 
 Now we have access to phpMyAdmin, and the second flag (`FLAG2`):
 
-![6](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/6.png)
+![6](/assets/img/post/pwntilldawn_morty/6.png)
 
 The application has no further information about what should we do, and using the same credentials for SSH didn't work. So I've decided to search for known CVEs based on PMA version that's available on source-code (`4.8.1`) and found a this [one](https://www.exploit-db.com/exploits/50457):
 
-![7](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/7.png)
+![7](/assets/img/post/pwntilldawn_morty/7.png)
 
 Who doesn't love RCE exploits? This exploit does require credentials, which we have at our disposal, so let's use it:
 
@@ -111,14 +111,14 @@ Who doesn't love RCE exploits? This exploit does require credentials, which we h
 python exploit.py rickscontrolpanel.mortysserver.com 80 / rick WubbaLubbaDubDub1! 'cat /etc/passwd'
 ```
 
-![8](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/8.png)
+![8](/assets/img/post/pwntilldawn_morty/8.png)
 
 Great! Now just we can either explore the server using this exploit or upload a shell. I've decided to use Python to server a PHP reverse shell, download it remotely using `wget` and use netcat to receive the connection.
 
-![9](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/9.png)
+![9](/assets/img/post/pwntilldawn_morty/9.png)
 
 After enumerating the server, thinking about how to escalate privileges, I've discovered that the last flag (`FLAG3`) was easily accessible in Morty's home directory:
 
-![10](/home/rebellion/blog/jlowborn.github.io/assets/img/post/pwntilldawn_morty/10.png)
+![10](/assets/img/post/pwntilldawn_morty/10.png)
 
 With the final flag, the CTF comes to the end!

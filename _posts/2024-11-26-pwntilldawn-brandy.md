@@ -59,15 +59,15 @@ The directory only has an image, tipping us about a potential username/password 
 
 The last directory `/dolibarr` leads us to a login page, but acessing the vhost directly show us the same page.
 
-![8](/home/rebellion/CTF/PwnTillDawn/Brandy/evidence/8.png)
+![8](/assets/img/post/pwntilldawn_brandy/8.png)
 
 As expected, it requires credentials, which we'll be using rick everywhere as the image told us to. This will lead us to the CRM dashboard, and unfortunately we don't have privileges other than accessing some Commercial Proposals.
 
-![9](/home/rebellion/CTF/PwnTillDawn/Brandy/evidence/9.png)
+![9](/assets/img/post/pwntilldawn_brandy/9.png)
 
 Speaking of which, grants us **FLAG62** as we verify the only proposal available, 4 more to go.
 
-![10](/home/rebellion/CTF/PwnTillDawn/Brandy/evidence/10.png)
+![10](/assets/img/post/pwntilldawn_brandy/10.png)
 
 There's no other information available for us other than that. So it's time to research for potential vulnerabilities. Lucky for us, the dashboard also provided us with a string version `5.0.3`.
 
