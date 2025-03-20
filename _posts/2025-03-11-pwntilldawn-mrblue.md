@@ -10,8 +10,6 @@ description: Abusing outdated SMB verions to exploit MS17-010.
 
 ![](/assets/img/post/pwntilldawn_mrblue/1.png)
 
-## 
-
 ## Initial Scanning
 
 Whenever scanning Windows machines, I feel like Nmap takes too long, so I've decided to go for [Rustscan](https://github.com/bee-san/RustScan) for faster results before using Nmap to get detailed information:
