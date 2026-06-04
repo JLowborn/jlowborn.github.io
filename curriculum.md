@@ -13,73 +13,73 @@ permalink: /curriculum/
 
 ---
 
-Part-time cybersecurity student with previous DevOps and pentesting experience working at Ocup and Dione Solutions. Recognized for pinpointing vulnerabilities in mobile apps, websites, and CMSs. Skilled at articulating risks for strategic decisions and presenting intricate concepts to diverse audiences. Notable leadership in CTF competitions. Additionally, adept at fostering collaborative environments to drive effective team performance in tackling complex cybersecurity challenges.
+Cybersecurity professional with experience in Security Operations, Threat Intelligence, and Offensive Security. Experienced in security monitoring, technical reporting, penetration testing, and threat analysis across web applications, mobile applications, and Active Directory environments.
 
-## Core Competencies
-
-- Vulnerability Assessment
-- Red Teaming
-- Pentesting
-- Risk Identification & Assessment
-- Technical Writing
-- Cybersecurity Documentation
-- Python
-- Bash
-- SQL
-- PHP
-- Azure Active Directory
-- Oracle Cloud
-
-## Industry Certifications
-
-- TCM Security Practical Ethical Hacking (2024)
-- Fortinet NSE I (2023)
-- Professional Qualification in Vulnerability and Intrusion Analysis Testing (2022)
-- Professional Qualification in Cybersecurity (2021)
-- Professional Qualification in Information Security Management (2021)
-- Cisco CyberOps Associate (2021)
+Holding a postgraduate degree in Offensive Cybersecurity and continuing to develop practical expertise through research, security labs, Capture The Flag competitions, and personal projects.
 
 ## Professional Experience
 
-### Dione Solutions  
-*Minato-ku, Tokyo*  
-*June 2023 – Aug 2023*  
+### Dfense Security
+
+*Remote*
+*Mar 2025 – Nov 2025*
+
+**Cybersecurity Analyst**
+
+* Produced technical and executive security reports for multiple audiences.
+* Monitored security solutions and alerts, supporting day-to-day security operations.
+* Assisted clients during incident handling and technical support activities.
+* Developed automation workflows and response templates that reduced repetitive operational workload.
+* Created runbooks and standardized procedures for recurring security scenarios.
+
+### Dione Solutions
+*Remote*
+*Jun 2023 – Aug 2023*
+
 **Cyber Security Consultant**
-- Executed mobile penetration tests, meticulously identifying and evaluating multiple vulnerabilities.
-- Conducted web app penetration tests, aiming to encourage user upgrades by showcasing enhanced security benefits.
-- Applied robust security protocols within Azure Active Directory to enhance safety measures and bolster overall system integrity.
 
-### Ocup  
-*Brooklin, SP*  
-*July 2022 – Aug 2022*  
-**DevOps Analyst**
-- Conducted penetration testing on the company's web applications, resulting in the identification of critical vulnerabilities.
-- Developed features for the company's tools, enhancing their usability.
-- Conducted code review and refactoring on C# code, making the code cleaner and reducing its overall size.
+* Performed web application penetration testing assessments.
+* Conducted mobile application security assessments.
+* Implemented security controls within Active Directory environments.
+* Executed an internal phishing awareness campaign.
+* Delivered technical reports containing findings and remediation recommendations.
 
-## Educational Achievements
+## Education
 
-### FIAP  
-*São Paulo, SP*  
-*Feb 2021 – Feb 2023*  
-**Cybersecurity Bachelor**
-- Areas of study included Information Assurance Policy Management, Offensive Cyber Security (Penetration Testing), Digital Forensics, Malware Analysis, Cloud Computing.
-- Led a team to first place during a challenge proposed by Carrefour to implement a solution able to collect Indicators of Compromise (IOCs) and generate reports to MISP, which is the equivalent of R$5000,00.
-- Achieved first place during a team CTF competition, the team was awarded prizes and vouchers.
+### FIAP
+**Postgraduate Degree – Offensive Cybersecurity**
+*Mar 2025 – Feb 2026*
 
-### ETEC  
-*Poá, SP*  
-*Feb 2017 – Feb 2019*  
-**Technical Education College**
-- Successfully executed a thesis project involving the development of a website for a local church.
-- Contributed to community-open events, showcasing teamwork and community engagement.
-- Undertook a notable project focused on green roofs, teaching about sustainability and environmental initiatives.
+Focus areas:
 
-<div style="display: flex; justify-content: center; margin-top: 20px; gap: 20px;">
-    <a href="/assets/file/cv_en.pdf" class="button">
-        <i class="fas fa-download"></i> Download PDF (English)
-    </a>
-    <a href="/assets/file/cv_br.pdf" class="button">
-        <i class="fas fa-download"></i> Download PDF (Portuguese)
-    </a>
-</div>
+* Offensive Security
+* Adversary Simulation
+* Active Directory Security
+* Web Application Security
+* Threat Modeling
+
+### FIAP
+**Technologist Degree – Cybersecurity**
+*Feb 2021 – Feb 2023*
+
+Highlights:
+
+* Digital Forensics
+* Malware Analysis
+* Threat Intelligence
+* Penetration Testing
+* Cloud Security
+
+Additional Projects:
+
+* Built security labs using pfSense, Snort, Linux, and Windows environments.
+* Developed an IOC extraction solution integrated with MISP for threat classification and enrichment.
+* Designed and maintained Active Directory laboratory environments.
+
+## Certifications
+
+* TCM Security – Practical Ethical Hacking (2024)
+* Cisco – CyberOps Associate (2021)
+* Fortinet – NSE 1 (2023)
+* FIAP – Vulnerability Analysis and Penetration Testing (2022)
+* FIAP – Intelligence and Counterintelligence (2022)
