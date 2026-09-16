@@ -130,6 +130,8 @@ User web may run the following commands on vulnnet-dotpy:
 
 A wildcard on the *arguments*. That means I get to choose what pip installs — and, funny enough, pip **executes** what it installs: it runs `setup.py egg_info` while reading the package metadata, so code at the top of that file runs with the privileges of the pip process. I pointed it at a directory I controlled and got a shell as `system-adm` (same socket + `dup2` + `pty.spawn` payload as before, just a different vehicle).
 
+![The new shell, now as system-adm](/assets/img/post/thm_vulnnetdotpy/4.png)
+
 The part worth writing down is the packaging detail, because it really took me a long time to figure out:
 
 > **pip does not install a file — it installs a project.**
