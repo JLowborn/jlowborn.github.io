@@ -31,6 +31,12 @@ PORT     STATE SERVICE VERSION
 
 **Werkzeug** is the development server that ships with **Flask**, so this is a Python application — and that header alone settles several questions later on. The room description wasn't joking about being Python focused.
 
+## A Few Accounts Later
+
+The application has a registration page, so I created an account — and noticed something right away: the name I had just chosen came **reflected back** on the page. That alone isn't a vulnerability, but my input coming back is always worth a second look, so I spent some time creating a few more accounts with different names, just to watch where my input showed up and how the application handled it.
+
+That habit is what made the next step obvious: if the app is happy to echo what I type, I want to know what else it does with it.
+
 ## The Page That Told Me Too Much
 
 The site is a login page and a bit of static content. Nothing worth attacking yet, but any page that doesn't exist returns a custom 404 which **prints the part of the URL that didn't match**:
@@ -53,11 +59,13 @@ http://vulnnet.thm:8080/%7B%7B7*7%7D%7D
 
 Trying anything useful ran straight into a **blacklist**: the app inspects the text you send and rejects it if it contains certain characters. Mapping it one character at a time — which is the only honest way to do it:
 
+{% raw %}
 ```
 {{ config }}          -> renders the whole Flask config object   (allowed)
 {{ 'A_B' }}           -> blocked
 {{ 'x.y' }}           -> blocked
 ```
+{% endraw %}
 
 Underscores and dots are rejected outright — and notice how thorough that is: it blocks the character *inside a string literal* too. No `__class__`, no `config.SECRET_KEY`, no `config['SECRET_KEY']`. Three common ways of writing attribute access, all dead.
 
@@ -65,9 +73,11 @@ Underscores and dots are rejected outright — and notice how thorough that is: 
 
 In Jinja, the dot is just sugar: `a.b` is `getattr(a, 'b')`, and the filter `attr` does exactly that with the name passed as a string:
 
+{% raw %}
 ```jinja
 {{ a|attr('b') }}
 ```
+{% endraw %}
 
 So the dot is replaceable. Item access is the same idea — `d['k']` is `d.__getitem__('k')` — which means brackets aren't needed either.
 
@@ -75,7 +85,7 @@ The underscore was the hard one, and the answer is that **the filter reads the t
 
 Two traps cost me real time here, and they're worth writing down because they look like the filter working when they're not:
 
-- `{{ config|attr('ENV') }}` renders **empty** instead of the value. That's not a block: the dot operator falls back to item access when `getattr` fails, but the `attr` filter does a plain `getattr` — and `config` is a dict, so attribute access finds nothing. The fix is access by item.
+- `{% raw %}{{ config|attr('ENV') }}{% endraw %}` renders **empty** instead of the value. That's not a block: the dot operator falls back to item access when `getattr` fails, but the `attr` filter does a plain `getattr` — and `config` is a dict, so attribute access finds nothing. The fix is access by item.
 - An empty result has three possible causes, and they need different responses: the filter blocked the request, the expression evaluated to nothing, or the value is genuinely empty. `|default('empty')` and `is undefined` tell them apart.
 
 ## Config, Straight Off the Template
@@ -121,12 +131,12 @@ Command execution through a URL is fine for looking around, but for the Linux si
 
 With a shell on the box, the Linux side is a normal audit — and the room being "Python focused" stops being a slogan the moment we run `sudo -l`:
 
-### A Package Deal
-
 ```
 User web may run the following commands on vulnnet-dotpy:
     (system-adm) NOPASSWD: /usr/bin/pip3 install *
 ```
+
+## A Package Deal
 
 A wildcard on the *arguments*. That means I get to choose what pip installs — and, funny enough, pip **executes** what it installs: it runs `setup.py egg_info` while reading the package metadata, so code at the top of that file runs with the privileges of the pip process. I pointed it at a directory I controlled and got a shell as `system-adm` (same socket + `dup2` + `pty.spawn` payload as before, just a different vehicle).
 
@@ -145,7 +155,7 @@ sudo -u system-adm /usr/bin/pip3 install /tmp/p
 
 No `setup()` call, no `cmdclass`, no `--no-build-isolation` — that last flag doesn't even exist in the pip 9 that ships with Python 3.6, and it wasn't needed anyway.
 
-### The Import Business
+## The Import Business
 
 `sudo -l` again, now as `system-adm`:
 
