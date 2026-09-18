@@ -50,7 +50,7 @@ msfconsole -q -x "use auxiliary/admin/http/tomcat_ghostcat;set rhosts vulnnet.th
 
 Only two options needed setting — `RPORT` already defaults to **8009** and `FILENAME` already points at `/WEB-INF/web.xml`.
 
-`/WEB-INF/web.xml` is the application's own descriptor, and the deployer had used the `<description>` field as a notice board:
+`/WEB-INF/web.xml` is the application's own descriptor, and the deployer had used its `description` field as a notice board:
 
 ![The web.xml description block leaking developer credentials](/assets/img/post/thm_vulnnetdotjar/2.png)
 
@@ -145,7 +145,7 @@ cat shell.jar | base64 -w0
 The JAR goes up as a **base64 blob** pasted straight into the shell and decoded there — no upload channel needed, and the binary never has to survive a terminal:
 
 ```sh
-echo '<base64 blob>' | base64 -d > shell.jar
+echo 'BASE64_BLOB' | base64 -d > shell.jar
 ```
 
 Then the interesting part: I let `sudo` run it.
