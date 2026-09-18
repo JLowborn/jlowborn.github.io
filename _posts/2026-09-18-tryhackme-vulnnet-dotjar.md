@@ -165,7 +165,7 @@ root@ip-10-144-168-18:~# id
 uid=0(root) gid=0(root) groups=0(root)
 ```
 
-Root. The user flag was waiting in `web`'s home, and the root flag in `/root` — `THM{1ae87fa6...}` and `THM{464c29e3...}`.
+Root. Both flags came at the end of the chain: `user.txt` was in `jdk-admin`'s home directory and `root.txt` in `/root` — `THM{1ae87fa6...}` and `THM{464c29e3...}`.
 
 ## Lessons Learned
 
