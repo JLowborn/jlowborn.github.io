@@ -113,7 +113,7 @@ hashcat --identify raw.txt
 hashcat -m 1800 -O raw.txt /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt --outfile-format=1,2 --outfile=cracked.txt
 ```
 
-:bulb: Quick Tip: `--outfile-format=1,2` saves each cracked line as `hash:password` instead of just the password, which makes it trivial to `grep` a specific account out of the results later. On hashcat 7 the format list is positional, so you compose it.
+> 💡 **Quick Tip:** `--outfile-format=1,2` saves each cracked line as `hash:password` instead of just the password, which makes it trivial to `grep` a specific account out of the results later. On hashcat 7 the format list is positional, so you compose it.
 
 And the output:
 
