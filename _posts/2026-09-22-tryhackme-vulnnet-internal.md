@@ -136,11 +136,15 @@ Then a simple `ssh -i ./ctf_key sys-internal@vulnnet.thm` gave me a shell as `sy
 
 ## TeamCity: The CI/CD Server Running as Root
 
-Enumerating the box from the inside, `ls -la /` showed a `TeamCity/` directory sitting at the filesystem root:
+Enumerating the box from the inside, `ps -efww` showed a Java process with TeamCity in the command line, `ss -utlpn` confirmed the web UI on port 8111, and `ls -la /` showed the `TeamCity/` directory sitting at the root of the filesystem:
 
-![ls -la / showing the root filesystem with TeamCity/ highlighted](/assets/img/post/thm_vulnnetinternal/8.png)
+![ps -efww and ss -utlpn output showing the TeamCity Java process on port 8111, and ls -la / showing TeamCity/ at root](/assets/img/post/thm_vulnnetinternal/8.png)
 
-A Java process was running as **root**, and the web UI sat on port 9090 — not exposed externally, so I tunneled it through my SSH session.
+Port 8111 isn't exposed externally, so I forwarded it through my SSH session:
+
+```sh
+ssh -L 8111:localhost:8111 sys-internal@vulnnet.thm
+```
 
 The login page greeted me with a yellow warning: **"No System Administrator found. Log in as a Super user to create an administrator account."**
 
@@ -150,30 +154,23 @@ Clicking that took me to the super-user token page:
 
 ![TeamCity super user authentication token page with empty token field](/assets/img/post/thm_vulnnetinternal/10.png)
 
-No credentials given by the room, so I grepped the logs instead:
+No credentials given by the room, so I googled for TeamCity's super-user token location and found it's written to the logs during startup. Grepping the log file surfaced it:
 
 ```sh
 grep -rni token /TeamCity/logs/catalina.out
 ```
 
-That token was sitting in plain text inside a log file. Adding `?super=<token>` to the URL logged me in as super admin without a password.
+That token was sitting in plain text. I copied it straight from the log and pasted it into the browser field — logged in as super admin without a password.
 
 ## The Build Step That Became Root
 
-From there I created a new build configuration and added a **Command Line** build step with a custom script:
+TeamCity is a CI/CD tool — similar to Jenkins or Groovy — and I've touched those before, so the interface felt familiar. I created a random project, added a **Command Line** build step, and pasted a Python reverse shell payload:
 
 ![TeamCity build step configuration showing Command Line runner with a Python reverse shell payload](/assets/img/post/thm_vulnnetinternal/11.png)
 
-The bare `bash -i` payload didn't hold, so I used a Python reverse shell and stabilized with **Penelope**:
+The bare `bash -i` payload didn't hold once the build fired, so I used a Python reverse shell and stabilized with **Penelope** on the listener side. Since TeamCity ran as root, the payload executed as root — and I had my shell without ever needing netcat or a separate listener box.
 
-```sh
-nc -lvnp 4444
-penelope 4444
-```
-
-When the build fired, Metasploit caught a session — and since TeamCity ran as root, I was root:
-
-![msfconsole showing an active root session on ip-10-145-168-118, Python reverse shell agent, shell in /TeamCity/buildAgent/work/](/assets/img/post/thm_vulnnetinternal/12.png)
+![Penelope catching the root shell and stabilizing it](/assets/img/post/thm_vulnnetinternal/12.png)
 
 One `cat /root/root.txt` later, the fourth flag dropped: `THM{e8996fae...}`.
 
@@ -181,7 +178,7 @@ One `cat /root/root.txt` later, the fourth flag dropped: `THM{e8996fae...}`.
 
 This machine is a story about **trust between adjacent services on a private network**. NFS shares a config directory without authentication, Redis stores a credential in its own keystore that decodes to a different service's password, rsync maps to writable home directories, and a CI/CD server runs as root with its super token leaking into a log file — all because internal services assume the network is trusted.
 
-The reusable version: treat every internal service as if it were public, read config files as human documents (they hold passwords), and check service logs for auth tokens that weren't meant to be logged. A writable share that maps to a user's home directory is an SSH key away from a shell — no password cracking required.
+The reusable version: treat every internal service as if it were public, read config files as human documents (they hold passwords), and check service logs for auth tokens that weren't meant to be logged. A writable share that maps to a user's home directory is an SSH key away from a shell — no password cracking required. And if a CI/CD tool runs as root, a single build step is all the execution primitive you need.
 
 And `TYPE` before `GET` in Redis saves you from a confusing `WRONGTYPE` error.
 
