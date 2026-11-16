@@ -76,7 +76,7 @@ show tables;
 ```
 
 ```text
-FLAG32_a40987757b60acc87e80196c757f2a19c8acc3b5
+FLAG32_a4098775...
 ```
 
 The flag is not in the table. It is the table's name — the same shape as a flag hidden in a DNS query label: the data is the identifier, and `select *` would never have shown it.
